@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cupertino Voices — A Community History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --paper: #efe8db;
+    --paper-deep: #e4dcca;
+    --paper-light: #f5efe3;
+    --ink: #1f1a14;
+    --ink-soft: #4a4036;
+    --ink-mute: #8a7e6f;
+    --rust: #8a3a1a;
+    --rust-deep: #5e2810;
+    --line: #c9bfa9;
+    --line-strong: #1f1a14;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Fraunces', Georgia, serif;
+    font-feature-settings: "ss01", "kern";
+    font-weight: 400;
+    overflow-x: hidden;
+    line-height: 1.55;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1000;
+    mix-blend-mode: multiply;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ NAV ============ */
+  nav.topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(239, 232, 219, 0.94);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    padding: 1.1rem 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 1.15rem; letter-spacing: -0.01em;
+    display: flex; align-items: baseline; gap: 0.5rem;
+    cursor: pointer;
+  }
+  .brand .dot {
+    width: 6px; height: 6px; background: var(--rust);
+    border-radius: 50%; display: inline-block; transform: translateY(-2px);
+  }
+  .brand-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-mute); font-weight: 400;
+  }
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+    font-family: 'Inter Tight', sans-serif; font-weight: 500; font-size: 0.82rem;
+  }
+  .nav-links a {
+    color: var(--ink-soft); position: relative;
+    padding: 0.25rem 0; transition: color 0.2s ease;
+    cursor: pointer; letter-spacing: 0.02em;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a.active { color: var(--ink); }
+  .nav-links a.active::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -2px;
+    height: 1px; background: var(--rust);
+  }
+
+  /* ============ PAGES ============ */
+  .page { display: none; min-height: 100vh; padding-top: 72px; animation: fadeIn 0.4s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 2.5rem; }
+
+  /* ============ HERO ============ */
+  .hero { padding: 5rem 0 4rem; }
+  .hero-meta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-mute);
+    padding-bottom: 1.2rem; border-bottom: 1px solid var(--line); margin-bottom: 4rem;
+  }
+  .hero-title {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: clamp(3rem, 8.5vw, 8rem); line-height: 0.95;
+    letter-spacing: -0.035em; margin-bottom: 3rem; max-width: 18ch;
+  }
+  .hero-title .accent { font-style: italic; font-weight: 300; color: var(--rust); }
+  .hero-body {
+    display: grid; grid-template-columns: 1.1fr 1fr;
+    gap: 5rem; align-items: start; margin-bottom: 4rem;
+  }
+  .hero-lede {
+    font-size: 1.2rem; line-height: 1.55; color: var(--ink-soft);
+    max-width: 540px; font-weight: 300;
+  }
+  .hero-lede strong { color: var(--ink); font-weight: 600; }
+  .hero-aside { border-top: 1px solid var(--line-strong); padding-top: 1rem; }
+  .aside-row {
+    display: grid; grid-template-columns: 1fr 2fr;
+    gap: 1rem; padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line); font-size: 0.95rem;
+  }
+  .aside-row .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute); padding-top: 0.2rem;
+  }
+  .aside-row .value { font-family: 'Fraunces', serif; color: var(--ink); }
+  .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 1.5rem;
+    font-family: 'Inter Tight', sans-serif; font-size: 0.82rem;
+    letter-spacing: 0.04em; font-weight: 500;
+    border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .btn:hover { background: var(--rust); border-color: var(--rust); }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn.ghost:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn .arrow { transition: transform 0.2s ease; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* ============ SECTIONS ============ */
+  .section { padding: 5rem 0; border-top: 1px solid var(--line); }
+  .section-head {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 3rem; margin-bottom: 3rem; align-items: baseline;
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute);
+  }
+  .section-label .num { color: var(--rust); margin-right: 0.6rem; }
+  .section-title {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.05;
+    letter-spacing: -0.025em; max-width: 22ch;
+  }
+  .section-title em { font-style: italic; color: var(--rust); font-weight: 300; }
+
+  /* ============ ON THIS DAY WIDGET (HOME) ============ */
+  .otd-card {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem;
+    margin-bottom: 4rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2.5rem;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .otd-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 232, 219, 0.55);
+    border-right: 1px solid rgba(239, 232, 219, 0.2);
+    padding-right: 2.5rem;
+    line-height: 1.5;
+  }
+  .otd-label .big-date {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 2rem; font-weight: 300;
+    color: var(--paper); letter-spacing: -0.02em;
+    margin-top: 0.3rem; text-transform: none;
+  }
+  .otd-fact {
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem; line-height: 1.4; font-weight: 400;
+    color: var(--paper);
+  }
+  .otd-fact .year {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+    color: var(--rust); letter-spacing: 0.1em; display: block;
+    margin-bottom: 0.5rem; font-weight: 500;
+  }
+  .otd-fact em { font-style: italic; color: rgba(239, 232, 219, 0.85); }
+  .otd-cycle {
+    background: transparent;
+    border: 1px solid rgba(239, 232, 219, 0.3);
+    color: var(--paper);
+    padding: 0.6rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .otd-cycle:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+
+  /* ============ ERA BLOCKS ============ */
+  .era-block {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 3rem; padding: 3rem 0;
+    border-top: 1px solid var(--line);
+    align-items: start;
+  }
+  .era-block:first-child { border-top: 1px solid var(--line-strong); }
+  .era-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.15em;
+    color: var(--rust); text-transform: uppercase;
+    position: sticky; top: 100px;
+  }
+  .era-label .years {
+    display: block;
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 2.4rem; color: var(--ink);
+    letter-spacing: -0.02em; margin-top: 0.4rem;
+    text-transform: none;
+  }
+  .era-content h3 {
+    font-family: 'Fraunces', serif; font-size: 1.7rem;
+    font-weight: 400; line-height: 1.2; letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+  .era-content h3 em { font-style: italic; color: var(--rust); }
+  .era-content p {
+    color: var(--ink-soft); font-size: 1.05rem; line-height: 1.65;
+    margin-bottom: 1.2rem; max-width: 640px;
+  }
+  .era-content p strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ FEATURED LIST ============ */
+  .featured-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .featured-row {
+    display: grid; grid-template-columns: 100px 1fr 280px 100px;
+    gap: 2rem; padding: 1.8rem 0;
+    border-top: 1px solid var(--line);
+    align-items: center; cursor: pointer;
+    transition: background 0.2s ease, padding 0.2s ease;
+  }
+  .featured-row:last-child { border-bottom: 1px solid var(--line); }
+  .featured-row:hover { background: var(--paper-light); padding-left: 1rem; }
+  .featured-row .year {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--ink-mute);
+  }
+  .featured-row .title {
+    font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;
+    line-height: 1.2; letter-spacing: -0.01em;
+  }
+  .featured-row .title em { font-style: italic; color: var(--rust); }
+  .featured-row .narrator {
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: var(--ink-soft); font-size: 0.95rem;
+  }
+  .featured-row .kind {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute); text-align: right;
+  }
+  .featured-row .kind.video { color: var(--rust); }
+
+  /* ============ ARCHIVE ============ */
+  .archive-controls {
+    display: flex; justify-content: space-between; align-items: end;
+    flex-wrap: wrap; gap: 2rem; margin-bottom: 2.5rem;
+  }
+  .filter-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .filter-btn {
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-soft); padding: 0.45rem 0.95rem;
+    font-family: 'Inter Tight', sans-serif; font-size: 0.78rem;
+    letter-spacing: 0.02em; cursor: pointer; border-radius: 0;
+    transition: all 0.2s ease; font-weight: 500;
+  }
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .search-box { position: relative; display: flex; align-items: center; }
+  .search-box svg {
+    position: absolute; left: 0.7rem; width: 14px; height: 14px;
+    color: var(--ink-mute); pointer-events: none;
+  }
+  .search-box input {
+    background: transparent; border: 1px solid var(--line);
+    padding: 0.55rem 0.7rem 0.55rem 2rem;
+    font-family: 'Fraunces', serif; font-size: 0.95rem;
+    width: 280px; color: var(--ink); outline: none; transition: border 0.2s;
+  }
+  .search-box input:focus { border-color: var(--ink); }
+  .search-box input::placeholder { color: var(--ink-mute); font-style: italic; }
+  .story-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem 2rem;
+  }
+  .story-card {
+    cursor: pointer; transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
+  }
+  .story-card:hover { transform: translateY(-3px); }
+  .story-card:hover .story-title { color: var(--rust); }
+  .story-image {
+    aspect-ratio: 5 / 4; background: var(--paper-deep);
+    position: relative; overflow: hidden;
+    display: grid; place-items: center;
+    margin-bottom: 1rem; border: 1px solid var(--line);
+  }
+  .story-card:nth-child(6n+1) .story-image { background: linear-gradient(140deg, #c4b596 0%, #9a8a6a 100%); }
+  .story-card:nth-child(6n+2) .story-image { background: linear-gradient(140deg, #b5a890 0%, #8a7d65 100%); }
+  .story-card:nth-child(6n+3) .story-image { background: linear-gradient(140deg, #c0ad8a 0%, #94815f 100%); }
+  .story-card:nth-child(6n+4) .story-image { background: linear-gradient(140deg, #b0a18a 0%, #847660 100%); }
+  .story-card:nth-child(6n+5) .story-image { background: linear-gradient(140deg, #beb19a 0%, #8e826c 100%); }
+  .story-card:nth-child(6n+6) .story-image { background: linear-gradient(140deg, #b8a78c 0%, #8a7858 100%); }
+  .placeholder-mark {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.5); text-transform: uppercase;
+  }
+  .story-tag {
+    position: absolute; top: 0.8rem; left: 0.8rem;
+    background: var(--paper); padding: 0.3rem 0.65rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink); z-index: 2;
+  }
+  .story-content { flex: 1; display: flex; flex-direction: column; }
+  .story-date {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; color: var(--ink-mute);
+    margin-bottom: 0.6rem; text-transform: uppercase;
+  }
+  .story-title {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 1.25rem; line-height: 1.25; letter-spacing: -0.01em;
+    margin-bottom: 0.5rem; color: var(--ink); transition: color 0.2s ease;
+  }
+  .story-title em { font-style: italic; font-weight: 400; }
+  .story-excerpt {
+    font-size: 0.95rem; color: var(--ink-soft);
+    line-height: 1.5; margin-bottom: 0.8rem;
+  }
+  .story-meta {
+    margin-top: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.05em; color: var(--ink-mute);
+    display: flex; justify-content: space-between;
+    padding-top: 0.8rem; border-top: 1px solid var(--line);
+  }
+  .empty-state {
+    grid-column: 1 / -1; text-align: center;
+    padding: 5rem 2rem;
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: var(--ink-mute); font-size: 1.1rem;
+  }
+
+  /* ============ TIMELINE ============ */
+  .timeline-wrap {
+    margin: 2rem 0 4rem;
+    position: relative;
+  }
+  .timeline-controls {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 2rem; gap: 2rem; flex-wrap: wrap;
+  }
+  .timeline-year {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    letter-spacing: -0.03em; line-height: 1; color: var(--rust);
+  }
+  .timeline-scrubber {
+    flex: 1; min-width: 280px;
+    position: relative; padding: 1.5rem 0;
+  }
+  .scrubber-track {
+    height: 2px; background: var(--line); position: relative;
+  }
+  .scrubber-fill {
+    position: absolute; top: 0; left: 0; height: 100%;
+    background: var(--ink); transition: width 0.1s linear;
+  }
+  .scrubber-input {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    margin: 0; padding: 0;
+    -webkit-appearance: none; appearance: none;
+    background: transparent; cursor: pointer;
+  }
+  .scrubber-input::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--ink);
+    cursor: grab; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin-top: 0;
+  }
+  .scrubber-input::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--ink);
+    cursor: grab; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .scrubber-marks {
+    display: flex; justify-content: space-between;
+    margin-top: 0.8rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; color: var(--ink-mute);
+  }
+  .timeline-event {
+    border-top: 1px solid var(--line-strong);
+    padding: 2.5rem 0; margin-top: 1rem;
+    display: grid; grid-template-columns: 200px 1fr 200px;
+    gap: 3rem; align-items: start;
+  }
+  .te-year {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 3rem; color: var(--ink);
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .te-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.12em;
+    color: var(--rust); text-transform: uppercase;
+    margin-top: 0.7rem;
+  }
+  .te-title {
+    font-family: 'Fraunces', serif; font-size: 1.6rem;
+    font-weight: 400; line-height: 1.2;
+    letter-spacing: -0.015em; margin-bottom: 0.8rem;
+  }
+  .te-title em { font-style: italic; color: var(--rust); }
+  .te-desc { color: var(--ink-soft); font-size: 1rem; line-height: 1.6; }
+  .te-aside {
+    border-left: 1px solid var(--line);
+    padding-left: 1.5rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: var(--ink-mute); letter-spacing: 0.08em;
+    line-height: 1.7;
+  }
+  .te-aside .label {
+    color: var(--rust); display: block; margin-bottom: 0.3rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .te-aside .value {
+    font-family: 'Fraunces', serif; font-size: 1rem;
+    color: var(--ink); text-transform: none; letter-spacing: 0;
+  }
+  .te-nav {
+    display: flex; gap: 0.5rem; margin-top: 2rem;
+  }
+  .te-nav-btn {
+    width: 40px; height: 40px;
+    border: 1px solid var(--ink);
+    display: grid; place-items: center;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .te-nav-btn:hover { background: var(--ink); color: var(--paper); }
+  .te-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .te-nav-btn:disabled:hover { background: transparent; color: var(--ink); }
+
+  /* ============ MAP ============ */
+  .map-wrapper {
+    display: grid; grid-template-columns: 1fr 320px;
+    gap: 1.5rem; margin-bottom: 4rem;
+  }
+  #map {
+    height: 600px; border: 1px solid var(--line-strong);
+    background: var(--paper-deep);
+  }
+  .map-sidebar {
+    border: 1px solid var(--line-strong); padding: 1.5rem;
+    height: 600px; overflow-y: auto; background: var(--paper-light);
+  }
+  .sidebar-head {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1rem; margin-bottom: 0.5rem;
+  }
+  .sidebar-title {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 1.2rem; margin-bottom: 0.2rem;
+  }
+  .sidebar-sub {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);
+  }
+  .pin-list { list-style: none; }
+  .pin-item {
+    padding: 1rem 0; border-bottom: 1px solid var(--line);
+    cursor: pointer; transition: padding 0.2s ease;
+  }
+  .pin-item:hover { padding-left: 0.5rem; }
+  .pin-item:hover h4 { color: var(--rust); }
+  .pin-item:last-child { border-bottom: none; }
+  .pin-item h4 {
+    font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 500;
+    margin-bottom: 0.2rem; transition: color 0.2s;
+  }
+  .pin-item .year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; color: var(--ink-mute); letter-spacing: 0.08em;
+  }
+  .ba-section { padding-top: 3rem; border-top: 1px solid var(--line); }
+  .ba-selector { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .ba-container {
+    width: 100%; aspect-ratio: 16 / 9;
+    position: relative; overflow: hidden;
+    border: 1px solid var(--line-strong);
+    user-select: none; cursor: ew-resize;
+  }
+  .ba-image {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    display: grid; place-items: center;
+  }
+  .ba-image .placeholder-mark {
+    color: rgba(255,255,255,0.4); font-size: 0.7rem;
+  }
+  .ba-before { background: linear-gradient(135deg, #6d5d44 0%, #443728 50%, #2a1f15 100%); }
+  .ba-after  { background: linear-gradient(135deg, #98a8b4 0%, #6c8090 50%, #455865 100%); clip-path: inset(0 0 0 50%); }
+  .ba-label {
+    position: absolute; top: 1rem;
+    padding: 0.3rem 0.7rem;
+    background: rgba(31, 26, 20, 0.88); color: var(--paper);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase; z-index: 3;
+  }
+  .ba-label.before { left: 1rem; }
+  .ba-label.after { right: 1rem; }
+  .ba-slider {
+    position: absolute; top: 0; bottom: 0; left: 50%;
+    width: 2px; background: var(--paper); z-index: 4;
+    transform: translateX(-50%); box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .ba-handle {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; height: 40px;
+    background: var(--paper); border: 1.5px solid var(--ink); border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .ba-caption {
+    margin-top: 1rem;
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: var(--ink-soft); font-size: 0.95rem; max-width: 700px;
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: var(--paper) !important; border-radius: 0 !important;
+    border: 1px solid var(--ink) !important;
+    box-shadow: 3px 3px 0 var(--ink) !important; padding: 0 !important;
+  }
+  .leaflet-popup-tip { background: var(--paper) !important; border: 1px solid var(--ink); }
+  .leaflet-popup-content {
+    font-family: 'Fraunces', serif !important;
+    margin: 0.9rem 1rem !important; min-width: 220px;
+  }
+  .popup-title { font-weight: 500; font-size: 1.05rem; margin-bottom: 0.2rem; }
+  .popup-year {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    color: var(--ink-mute); letter-spacing: 0.12em; margin-bottom: 0.5rem;
+  }
+  .popup-desc { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.4; margin-bottom: 0.7rem; }
+  .popup-link {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--rust); border-bottom: 1px solid var(--rust);
+    padding-bottom: 1px; cursor: pointer;
+  }
+  .popup-link:hover { color: var(--rust-deep); }
+  .custom-pin {
+    background: var(--rust); width: 12px !important; height: 12px !important;
+    border-radius: 50%; border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1.5px var(--rust), 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+  }
+  .custom-pin:hover { transform: scale(1.4); }
+
+  /* ============ ABOUT ============ */
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 5rem; padding: 4rem 0;
+  }
+  .about-prose {
+    font-family: 'Fraunces', serif; font-size: 1.15rem;
+    line-height: 1.65; color: var(--ink);
+  }
+  .about-prose p { margin-bottom: 1.3rem; }
+  .about-prose p:last-child { margin-bottom: 0; }
+  .about-stats {
+    border-left: 1px solid var(--line-strong);
+    padding-left: 2.5rem; align-self: start;
+  }
+  .stat { padding: 1.2rem 0; border-bottom: 1px solid var(--line); }
+  .stat:last-child { border-bottom: none; }
+  .stat-num {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 2.5rem; line-height: 1;
+    letter-spacing: -0.02em; margin-bottom: 0.3rem;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);
+  }
+
+  /* ============ CONTRIBUTE ============ */
+  .contribute {
+    background: var(--ink); color: var(--paper);
+    padding: 4rem; margin: 4rem 0 6rem;
+  }
+  .contribute-inner {
+    display: grid; grid-template-columns: 1fr 1.2fr;
+    gap: 4rem; max-width: 1200px; margin: 0 auto;
+  }
+  .contribute h2 {
+    font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 400;
+    line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 1.2rem;
+  }
+  .contribute h2 em { font-style: italic; color: var(--paper); opacity: 0.7; }
+  .contribute p {
+    color: rgba(239, 232, 219, 0.7); font-size: 1rem;
+    line-height: 1.6; margin-bottom: 1.5rem;
+  }
+  .contribute-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-field label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(239, 232, 219, 0.5);
+  }
+  .form-field input, .form-field textarea, .form-field select {
+    background: transparent; border: 1px solid rgba(239, 232, 219, 0.25);
+    color: var(--paper); padding: 0.7rem 0.8rem;
+    font-family: 'Fraunces', serif; font-size: 0.95rem;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color: var(--paper); }
+  .form-field textarea { resize: vertical; min-height: 100px; }
+  .form-field select option { background: var(--ink); color: var(--paper); }
+  .btn-light {
+    background: var(--paper); color: var(--ink); border: 1px solid var(--paper);
+    padding: 0.9rem 1.6rem;
+    font-family: 'Inter Tight', sans-serif; font-size: 0.82rem;
+    letter-spacing: 0.04em; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-light:hover { background: transparent; color: var(--paper); }
+  .form-success {
+    padding: 1rem; border: 1px solid #7a9a6a;
+    background: rgba(122, 154, 106, 0.1);
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: #c4d8b8; display: none;
+  }
+  .form-success.show { display: block; }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31, 26, 20, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200; display: none;
+    align-items: center; justify-content: center;
+    padding: 2rem; animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--paper); max-width: 640px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    padding: 2.5rem; position: relative;
+    border: 1px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
+  }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    font-size: 1.3rem; color: var(--ink-mute);
+    cursor: pointer; transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--ink); }
+  .modal-tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--rust); margin-bottom: 1rem;
+  }
+  .modal h2 {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.9rem;
+    line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 0.5rem;
+  }
+  .modal h2 em { font-style: italic; color: var(--rust); }
+  .modal-narrator {
+    font-family: 'Fraunces', serif; font-style: italic;
+    color: var(--ink-soft); margin-bottom: 1.5rem;
+  }
+  .modal-placeholder-media {
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #b5a890 0%, #6f6450 100%);
+    margin-bottom: 1.5rem; display: grid; place-items: center;
+    border: 1px solid var(--line);
+  }
+  .modal-placeholder-media .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+  .modal-body { color: var(--ink-soft); line-height: 1.65; font-size: 1rem; }
+  .modal-body p { margin-bottom: 1rem; }
+
+  /* ============ FOOTER ============ */
+  footer { background: var(--ink); color: var(--paper); padding: 4rem 0 2rem; }
+  .footer-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 0 2.5rem;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-brand h3 {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 1.5rem; line-height: 1.25;
+    margin-bottom: 1rem; max-width: 380px;
+  }
+  .footer-brand h3 em { font-style: italic; color: rgba(239, 232, 219, 0.65); }
+  .footer-brand p {
+    color: rgba(239, 232, 219, 0.55); font-size: 0.9rem;
+    line-height: 1.55; max-width: 360px;
+  }
+  .footer-col h4 {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(239, 232, 219, 0.5); margin-bottom: 1.2rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 0.6rem; font-family: 'Fraunces', serif; font-size: 0.95rem; }
+  .footer-col a {
+    color: rgba(239, 232, 219, 0.8); cursor: pointer; transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--paper); }
+  .footer-bottom {
+    max-width: 1280px; margin: 0 auto;
+    padding: 2rem 2.5rem 0;
+    border-top: 1px solid rgba(239, 232, 219, 0.1);
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.08em; color: rgba(239, 232, 219, 0.4);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 980px) {
+    .hero-body { grid-template-columns: 1fr; gap: 2.5rem; }
+    .section-head { grid-template-columns: 1fr; gap: 0.8rem; }
+    .era-block { grid-template-columns: 1fr; gap: 1rem; }
+    .era-label { position: static; }
+    .timeline-event { grid-template-columns: 1fr; gap: 1.5rem; }
+    .te-aside { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-top: 1rem; }
+    .map-wrapper { grid-template-columns: 1fr; }
+    .map-sidebar { height: auto; max-height: 400px; }
+    .story-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .about-stats { border-left: none; border-top: 1px solid var(--line-strong); padding-left: 0; padding-top: 1.5rem; }
+    .featured-row { grid-template-columns: 80px 1fr 80px; gap: 1rem; }
+    .featured-row .narrator { display: none; }
+    .contribute { padding: 2.5rem; }
+    .contribute-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .nav-links { gap: 1rem; font-size: 0.74rem; }
+    nav.topbar { padding: 1rem 1.2rem; }
+    .container { padding: 0 1.2rem; }
+    .footer-inner, .footer-bottom { padding-left: 1.2rem; padding-right: 1.2rem; }
+    .otd-card { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.8rem; }
+    .otd-label { border-right: none; border-bottom: 1px solid rgba(239,232,219,0.2); padding-right: 0; padding-bottom: 1.2rem; }
+  }
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .brand-sub { display: none; }
+    .story-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 0.5rem; }
+    .hero { padding: 3rem 0 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="brand" data-goto="home">
+    <span class="dot"></span>
+    Cupertino Voices
+    <span class="brand-sub">est. 2026</span>
+  </div>
+  <ul class="nav-links">
+    <li><a data-page="home" class="active">Home</a></li>
+    <li><a data-page="story">Our Story</a></li>
+    <li><a data-page="timeline">Timeline</a></li>
+    <li><a data-page="map">Then &amp; Now</a></li>
+    <li><a data-page="stories">Archive</a></li>
+    <li><a data-page="about">About</a></li>
+  </ul>
+</nav>
+
+<!-- ============ HOME ============ -->
+<section class="page active" id="page-home">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-meta-row">
+        <span>A Community History of Cupertino</span>
+        <span>Vol. I · <span id="date-stamp"></span></span>
+      </div>
+
+      <h1 class="hero-title">
+        The voices we kept,<br>
+        <span class="accent">and the ones we almost lost.</span>
+      </h1>
+
+      <div class="hero-body">
+        <p class="hero-lede">
+          Before the office parks and the freeways, this valley was apricot orchards, ranch land, and family farms. <strong>Cupertino Voices</strong> gathers the people, places, and memories that built the city — through oral histories, photographs, and short documentaries told by the families who lived them.
+        </p>
+        <div class="hero-aside">
+          <div class="aside-row">
+            <span class="label">Span</span>
+            <span class="value">1850 — Present</span>
+          </div>
+          <div class="aside-row">
+            <span class="label">Format</span>
+            <span class="value">Video, audio, photo, document</span>
+          </div>
+          <div class="aside-row">
+            <span class="label">Updated</span>
+            <span class="value" id="updated-stamp">In active collection</span>
+          </div>
+          <div class="aside-row">
+            <span class="label">Open</span>
+            <span class="value">Free for the public, always</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-cta">
+        <button class="btn" data-goto="story">
+          Read our story
+          <span class="arrow">→</span>
+        </button>
+        <button class="btn ghost" data-goto="map">
+          Explore the map
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- ON THIS DAY -->
+    <div class="otd-card">
+      <div class="otd-label">
+        On This Day
+        <span class="big-date" id="otd-date">May 26</span>
+      </div>
+      <div class="otd-fact">
+        <span class="year" id="otd-year">— in Cupertino's history</span>
+        <span id="otd-text">Loading…</span>
+      </div>
+      <button class="otd-cycle" id="otd-cycle">
+        Next ↻
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <div class="section-head">
+        <div class="section-label"><span class="num">§ 01</span>Four Ways In</div>
+        <h2 class="section-title">Find Cupertino's history <em>your way</em>.</h2>
+      </div>
+
+      <div class="featured-list">
+        <div class="featured-row" data-goto="story">
+          <span class="year">Long read</span>
+          <span class="title">The <em>story</em> of Cupertino, told decade by decade</span>
+          <span class="narrator">— A narrative history</span>
+          <span class="kind video">Read →</span>
+        </div>
+        <div class="featured-row" data-goto="timeline">
+          <span class="year">1850 — Now</span>
+          <span class="title">An interactive <em>timeline</em> of major events</span>
+          <span class="narrator">— Scroll the years</span>
+          <span class="kind">Explore →</span>
+        </div>
+        <div class="featured-row" data-goto="map">
+          <span class="year">6 places</span>
+          <span class="title">A <em>map</em> with before-and-after photographs</span>
+          <span class="narrator">— Then &amp; now</span>
+          <span class="kind">View →</span>
+        </div>
+        <div class="featured-row" data-goto="stories">
+          <span class="year">Growing</span>
+          <span class="title">The full <em>archive</em> of oral histories &amp; photographs</span>
+          <span class="narrator">— Searchable, filterable</span>
+          <span class="kind">Browse →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <div class="section-head">
+        <div class="section-label"><span class="num">§ 02</span>Featured Stories</div>
+        <h2 class="section-title">From the <em>collection</em>.</h2>
+      </div>
+
+      <div class="featured-list" id="featured-list"></div>
+
+      <div style="margin-top: 2.5rem;">
+        <button class="btn ghost" data-goto="stories">
+          View all stories
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STORY (NARRATIVE HISTORY) ============ -->
+<section class="page" id="page-story">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-meta-row">
+        <span>A Narrative History</span>
+        <span>Read time · ~8 min</span>
+      </div>
+
+      <h1 class="hero-title" style="font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch;">
+        The story of <span class="accent">Cupertino</span>.
+      </h1>
+
+      <p class="hero-lede" style="margin-bottom: 4rem; max-width: 640px;">
+        From Ohlone homeland to apricot capital to the world's address for Silicon Valley — Cupertino's transformation across two centuries, told in five chapters.
+      </p>
+
+      <div class="era-block">
+        <div class="era-label">Chapter I<span class="years">Before</span></div>
+        <div class="era-content">
+          <h3>The valley before <em>the maps</em>.</h3>
+          <p>For thousands of years before any place here had a written name, this land was home to the <strong>Tamien Ohlone</strong>, who lived along the creek that would one day be called Stevens. They fished its waters, tended the oak groves, and traveled the trails that European maps would later straighten into roads.</p>
+          <p>When the Spanish arrived in 1776 with the De Anza expedition, they crossed a valley they described as wooded, watered, and improbably green. The mission system that followed disrupted Ohlone life profoundly. The land that is now Cupertino was carved into ranchos — Rancho Quito and Rancho San Antonio — long before it would be carved into city blocks.</p>
+        </div>
+      </div>
+
+      <div class="era-block">
+        <div class="era-label">Chapter II<span class="years">1850s — 1900</span></div>
+        <div class="era-content">
+          <h3>A creek, a crossroads, a name.</h3>
+          <p>The valley filled in with settlers after California statehood. A French immigrant named <strong>Elisha Stephens</strong> — yes, that Stevens — gave his name to the creek (with a spelling change along the way). At a small crossroads where Stevens Creek Road met Saich Way, a wine merchant named John T. Doyle named his estate "Cupertino" after a Spanish friar who had blessed the original De Anza expedition.</p>
+          <p>The name spread. A blacksmith shop, a hotel, a post office. By the 1890s, "Cupertino" referred to a community of farmers — French, Italian, Portuguese — growing grapes, prunes, and the apricots that would define the place for the next half-century.</p>
+        </div>
+      </div>
+
+      <div class="era-block">
+        <div class="era-label">Chapter III<span class="years">1900 — 1955</span></div>
+        <div class="era-content">
+          <h3>The orchard <em>years</em>.</h3>
+          <p>By the early 1900s, the Santa Clara Valley was already known as the "Valley of Heart's Delight" — and Cupertino was at its center. <strong>Apricot orchards</strong> stretched horizon to horizon. Families like the Maisches, the Stocklmeirs, and the Saichs ran the farms; seasonal workers, many from the Philippines, Japan, and Mexico, came for the harvest.</p>
+          <p>The Blackberry Farm Resort opened in 1924. The Cali Brothers feed mill rose near the railroad tracks. The community had schools, churches, a Grange hall — but no city government. Cupertino was still, on paper, just a corner of unincorporated Santa Clara County.</p>
+          <p>That changed when neighboring San Jose, hungry for tax base, began annexing land at an aggressive clip in the early 1950s. To stay independent, Cupertino's farmers and shopkeepers gathered, organized, and voted.</p>
+        </div>
+      </div>
+
+      <div class="era-block">
+        <div class="era-label">Chapter IV<span class="years">1955 — 1990</span></div>
+        <div class="era-content">
+          <h3>From orchard to <em>chip fab</em>.</h3>
+          <p>Cupertino was incorporated as a city on <strong>October 10, 1955</strong>, with a population of about 2,500. The next thirty-five years were the most transformative in its history.</p>
+          <p>De Anza College opened on the old Beaulieu ranch in 1967. Vallco Park, the city's first major commercial development, broke ground. The orchards came down one by one — replaced by housing tracts for the engineers flooding into the South Bay to work at Hewlett-Packard, Fairchild, and a new company called Intel just up the road.</p>
+          <p>In 1976, a quiet computer company called Apple Computer was founded in nearby Los Altos. It moved to Cupertino in 1977. By the late 1980s, Apple's "Infinite Loop" campus was the city's largest employer. The orchard era was over; Cupertino had become a Silicon Valley city.</p>
+        </div>
+      </div>
+
+      <div class="era-block">
+        <div class="era-label">Chapter V<span class="years">1990 — Now</span></div>
+        <div class="era-content">
+          <h3>The city of the world we know.</h3>
+          <p>The Cupertino of the past three decades is a city of <strong>extraordinary global reach</strong> — and extraordinary local change. The arrival of immigrants from across Asia, particularly from Taiwan, India, and mainland China, has rebuilt the city's cultural life. Its public schools became some of the most competitive in the country. Apple Park, the spaceship campus, opened in 2017 down the road from where the apricots once grew.</p>
+          <p>Today, Cupertino is famous around the world for a company that doesn't print its city's name on most of its products. Most Cupertino residents have never lived in an orchard. But the families who remember the old days still walk these streets — and their stories, gathered here, are how we keep the city's full history alive.</p>
+          <p>This is what <em>Cupertino Voices</em> exists to do: not to preserve a nostalgia, but to keep the chain unbroken between everyone who has called this place home.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 4rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="btn" data-goto="timeline">
+          See the timeline
+          <span class="arrow">→</span>
+        </button>
+        <button class="btn ghost" data-goto="stories">
+          Browse the archive
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TIMELINE ============ -->
+<section class="page" id="page-timeline">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-meta-row">
+        <span>Interactive Timeline</span>
+        <span>14 events · 175 years</span>
+      </div>
+
+      <h1 class="hero-title" style="font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch;">
+        Cupertino, <span class="accent">year by year</span>.
+      </h1>
+
+      <p class="hero-lede" style="margin-bottom: 2rem; max-width: 640px;">
+        Drag the slider or use the arrows to move through Cupertino's history. Each event includes the date, what happened, and what part of the city it changed.
+      </p>
+
+      <div class="timeline-wrap">
+        <div class="timeline-controls">
+          <div class="timeline-year" id="tl-year">1776</div>
+          <div class="timeline-scrubber">
+            <div class="scrubber-track">
+              <div class="scrubber-fill" id="scrubber-fill"></div>
+            </div>
+            <input type="range" min="0" max="13" value="0" class="scrubber-input" id="scrubber" />
+            <div class="scrubber-marks">
+              <span>1776</span>
+              <span>1850</span>
+              <span>1900</span>
+              <span>1950</span>
+              <span>2000</span>
+              <span>2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-event">
+          <div>
+            <div class="te-year" id="te-year">1776</div>
+            <div class="te-tag" id="te-tag">Pre-history</div>
+          </div>
+          <div>
+            <h3 class="te-title" id="te-title">Loading…</h3>
+            <p class="te-desc" id="te-desc"></p>
+          </div>
+          <div class="te-aside">
+            <span class="label">Where</span>
+            <span class="value" id="te-where">—</span>
+            <div style="margin-top: 1.2rem;">
+              <span class="label">Look up</span>
+              <span class="value" id="te-source">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="te-nav">
+          <button class="te-nav-btn" id="tl-prev" title="Previous event">←</button>
+          <button class="te-nav-btn" id="tl-next" title="Next event">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAP ============ -->
+<section class="page" id="page-map">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-meta-row">
+        <span>Interactive Map</span>
+        <span>6 locations · expanding</span>
+      </div>
+
+      <h1 class="hero-title" style="font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 18ch;">
+        Then <span class="accent">&amp;</span> now.
+      </h1>
+
+      <p class="hero-lede" style="margin-bottom: 3rem;">
+        Pin by pin, we are mapping the Cupertino that was — and showing how it became the one we know. Click any pin or list entry to fly to that place, and drag the slider below to travel between decades.
+      </p>
+
+      <div class="map-wrapper">
+        <div id="map"></div>
+        <aside class="map-sidebar">
+          <div class="sidebar-head">
+            <div class="sidebar-title">Pinned Locations</div>
+            <div class="sidebar-sub">— click to fly to map</div>
+          </div>
+          <ul class="pin-list" id="pin-list"></ul>
+        </aside>
+      </div>
+
+      <div class="ba-section">
+        <div class="section-head" style="margin-bottom: 1.5rem;">
+          <div class="section-label"><span class="num">§</span>Before &amp; After</div>
+          <h2 class="section-title" style="font-size: clamp(1.6rem, 3vw, 2.4rem);">Travel between <em>eras</em>.</h2>
+        </div>
+
+        <div class="ba-selector" id="ba-selector">
+          <button class="filter-btn active" data-ba="0">Stevens Creek Blvd · 1955 ↔ 2026</button>
+          <button class="filter-btn" data-ba="1">Blackberry Farm · 1970 ↔ 2026</button>
+          <button class="filter-btn" data-ba="2">De Anza Crossroads · 1948 ↔ 2026</button>
+        </div>
+
+        <div class="ba-container" id="ba-container">
+          <div class="ba-image ba-before"><span class="placeholder-mark" id="ba-before-label">Before placeholder · 1955</span></div>
+          <div class="ba-image ba-after" id="ba-after"><span class="placeholder-mark" id="ba-after-label">After placeholder · 2026</span></div>
+          <div class="ba-label before" id="ba-label-before">Before · 1955</div>
+          <div class="ba-label after" id="ba-label-after">After · 2026</div>
+          <div class="ba-slider" id="ba-slider">
+            <div class="ba-handle">⇆</div>
+          </div>
+        </div>
+
+        <p class="ba-caption" id="ba-caption">
+          Stevens Creek Boulevard at the De Anza intersection — once a two-lane road between apricot orchards, now the city's commercial spine. Photographs will be sourced from the Cupertino Historical Society and community contributions.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STORIES (ARCHIVE) ============ -->
+<section class="page" id="page-stories">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-meta-row">
+        <span>The Full Archive</span>
+        <span>Filter · Search · Browse</span>
+      </div>
+
+      <h1 class="hero-title" style="font-size: clamp(2.5rem, 6vw, 5rem); max-width: 26ch;">
+        Every story, <span class="accent">searchable.</span>
+      </h1>
+
+      <p class="hero-lede" style="margin-bottom: 2.5rem;">
+        Filter by medium, search by name, place, or year. Each entry shows a placeholder layout until interviews and documents are added — click any card to see the full preview.
+      </p>
+
+      <div class="archive-controls">
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="video">Video</button>
+          <button class="filter-btn" data-filter="audio">Audio</button>
+          <button class="filter-btn" data-filter="photo">Photograph</button>
+          <button class="filter-btn" data-filter="doc">Document</button>
+          <button class="filter-btn" data-filter="family">Family</button>
+          <button class="filter-btn" data-filter="business">Business</button>
+          <button class="filter-btn" data-filter="school">School</button>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="search-input" placeholder="search by name, place, year…" />
+        </div>
+      </div>
+
+      <div class="story-grid" id="archive-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="page" id="page-about">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-meta-row">
+        <span>About the Archive</span>
+        <span>Community-sourced · Free &amp; open</span>
+      </div>
+
+      <h1 class="hero-title" style="font-size: clamp(2.5rem, 6vw, 5rem); max-width: 22ch;">
+        Built <span class="accent">together.</span><br>
+        Kept <span class="accent">open.</span>
+      </h1>
+
+      <div class="about-grid">
+        <div class="about-prose">
+          <p>Cupertino Voices is a public archive of the people, places, and memories that built the city. It exists because so much of Cupertino's history is held not in books or museums, but in the photo albums, kitchen-table stories, and lived memory of the families who have called this valley home.</p>
+          <p>The archive is community-sourced. Every interview, photograph, and document was contributed by a resident, family, or local institution. Everything in the collection is made freely available — for neighbors curious about their street, for descendants tracing their own family in the broader story, for students learning the city's past, and for researchers documenting it.</p>
+          <p>We gather across generations: longtime residents who remember Stevens Creek as a creek, newcomers whose stories are no less Cupertino for being new, business owners, teachers, gardeners, children. The archive will never be finished, because the community never is.</p>
+        </div>
+
+        <div class="about-stats">
+          <div class="stat">
+            <div class="stat-num">~175</div>
+            <div class="stat-label">Years of history</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">14</div>
+            <div class="stat-label">Timeline milestones</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">12+</div>
+            <div class="stat-label">Stories in collection</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">∞</div>
+            <div class="stat-label">Voices still to gather</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contribute" id="contribute-section">
+        <div class="contribute-inner">
+          <div>
+            <h2>Have a story <em>worth keeping?</em></h2>
+            <p>If you've lived in Cupertino — for a year or for sixty — we'd love to hear from you. Share a photograph, sit for an interview, or point us toward someone whose story matters. Every submission is reviewed within two weeks.</p>
+            <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; color: rgba(239, 232, 219, 0.5); margin-top: 1.5rem;">
+              Or reach us directly:<br>
+              <span style="color: rgba(239, 232, 219, 0.85);">voices@cupertinoarchive.example</span>
+            </p>
+          </div>
+
+          <form class="contribute-form" id="contribute-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="cf-name">Your Name</label>
+                <input type="text" id="cf-name" required>
+              </div>
+              <div class="form-field">
+                <label for="cf-email">Email</label>
+                <input type="email" id="cf-email" required>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="cf-kind">What would you like to share?</label>
+              <select id="cf-kind">
+                <option>An oral history interview</option>
+                <option>Photographs or documents</option>
+                <option>A family member's story</option>
+                <option>I want to volunteer</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="cf-message">Tell us a bit more</label>
+              <textarea id="cf-message" placeholder="A short note about what you'd like to contribute — no need to share details yet."></textarea>
+            </div>
+            <button type="submit" class="btn-light" id="form-submit">
+              Send Submission
+              <span class="arrow">→</span>
+            </button>
+            <div class="form-success" id="form-success">
+              Thank you — your message has been queued. Someone will be in touch within two weeks.
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <span class="modal-close" id="modal-close">×</span>
+    <div class="modal-tag" id="modal-tag">Video Interview · 18:42</div>
+    <h2 id="modal-title">Story title</h2>
+    <p class="modal-narrator" id="modal-narrator">— Narrator name</p>
+    <div class="modal-placeholder-media">
+      <span class="label" id="modal-media-label">Media placeholder · awaiting contribution</span>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>A living archive of Cupertino, <em>by Cupertino.</em></h3>
+      <p>Stories, photographs, and oral histories of the people, places, and memories that built the city.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a data-goto="story">Our Story</a></li>
+        <li><a data-goto="timeline">Timeline</a></li>
+        <li><a data-goto="map">Then &amp; Now Map</a></li>
+        <li><a data-goto="stories">Archive</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Get Involved</h4>
+      <ul>
+        <li><a data-goto="about" data-scroll="contribute-section">Contribute a Story</a></li>
+        <li><a data-goto="about" data-scroll="contribute-section">Volunteer</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Project</h4>
+      <ul>
+        <li><a data-goto="about">About</a></li>
+        <li><a data-goto="about" data-scroll="contribute-section">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Cupertino Voices · A Community Archive</span>
+    <span>Made in California</span>
+  </div>
+</footer>
+
+<script>
+// ============ DATE ============
+const today = new Date();
+document.getElementById('date-stamp').textContent =
+  today.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+// ============ NAV ============
+const pages = document.querySelectorAll('.page');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+function showPage(pageId, scrollTargetId) {
+  pages.forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + pageId);
+  if (!target) return;
+  target.classList.add('active');
+  navLinks.forEach(l => l.classList.toggle('active', l.dataset.page === pageId));
+
+  if (pageId === 'map' && !mapInitialized) {
+    requestAnimationFrame(() => initMap());
+  }
+  if (pageId === 'stories' && !storiesRendered) renderArchive();
+  if (pageId === 'timeline' && !timelineRendered) renderTimeline(0);
+
+  if (scrollTargetId) {
+    setTimeout(() => {
+      const el = document.getElementById(scrollTargetId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+navLinks.forEach(link => {
+  link.addEventListener('click', () => showPage(link.dataset.page));
+});
+
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('[data-goto]');
+  if (target) {
+    e.preventDefault();
+    showPage(target.dataset.goto, target.dataset.scroll);
+  }
+});
+
+// ============ ON THIS DAY ============
+const otdFacts = [
+  { year: 1776, text: "The De Anza expedition crossed the valley that would one day take its name, mapping land that had been Tamien Ohlone territory for thousands of years." },
+  { year: 1850, text: "California became the 31st U.S. state, opening the door to a wave of settlers — including French, Italian, and Portuguese immigrants — into what was then ranchero land." },
+  { year: 1898, text: "A French wine-merchant's estate at the crossroads of Stevens Creek Road gave its name — Cupertino — to the surrounding community of orchard farmers." },
+  { year: 1924, text: "The original Blackberry Farm Resort opened along Stevens Creek, becoming a beloved summer destination for generations of Bay Area families." },
+  { year: 1955, text: "Cupertino was incorporated as a city on October 10, with a population of about 2,500. Most residents still farmed apricots or worked the canneries." },
+  { year: 1967, text: "De Anza College opened its doors on the former Beaulieu Vineyard ranch — its first classes meeting in temporary buildings amid the old grapevines." },
+  { year: 1977, text: "Apple Computer moved its headquarters to Cupertino, occupying a small office at 20863 Stevens Creek Boulevard." },
+  { year: 1993, text: "Apple's 'Infinite Loop' campus opened on the former site of an apricot orchard, becoming the city's most recognized address." },
+  { year: 2017, text: "Apple Park — the ring-shaped 'spaceship' campus — opened on land that had grown apricots within living memory of many Cupertino residents." },
+];
+let otdIdx = 0;
+function showOtd() {
+  const fact = otdFacts[otdIdx];
+  document.getElementById('otd-year').textContent = `${fact.year} — in Cupertino's history`;
+  document.getElementById('otd-text').textContent = fact.text;
+}
+document.getElementById('otd-date').textContent = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+document.getElementById('otd-cycle').addEventListener('click', () => {
+  otdIdx = (otdIdx + 1) % otdFacts.length;
+  showOtd();
+});
+// pick a "random" starter based on day-of-year for variety
+otdIdx = Math.floor((today.getMonth() * 30 + today.getDate()) % otdFacts.length);
+showOtd();
+
+// ============ ARCHIVE ============
+const archiveItems = [
+  { id: 'a01', type: 'video',  title: 'Six decades on <em>Stelling Road</em>',          tag: 'Video · 18:42',  date: 'Spring 2026',    cat: 'family',    era: '1962—Now',  narrator: 'Placeholder Family',     excerpt: 'A multi-generational family on apricot harvests, the bakery on the corner, and the morning the bulldozers arrived.' },
+  { id: 'a02', type: 'audio',  title: 'The De Anza years',                                tag: 'Audio · 24:10',  date: 'Oral History',   cat: 'school',    era: '1967—1995', narrator: 'Placeholder Narrator',   excerpt: 'A founding faculty member on building a community college from former ranch land.' },
+  { id: 'a03', type: 'photo',  title: 'Stevens Creek, <em>before the freeway</em>',       tag: 'Photograph',     date: '1949',           cat: 'family',    era: '1949',      narrator: 'Donated by family',      excerpt: 'A black-and-white from 1949, donated by a fourth-generation Cupertino resident.' },
+  { id: 'a04', type: 'doc',    title: 'The original town charter',                         tag: 'Document',       date: 'Historical',     cat: 'business',  era: '1955',      narrator: 'City of Cupertino',      excerpt: "Cupertino's 1955 incorporation papers, scanned from city records." },
+  { id: 'a05', type: 'video',  title: 'Saturdays at <em>the farm</em>',                    tag: 'Video · 7:21',   date: 'Short Doc',      cat: 'family',    era: '1972—1989', narrator: 'Placeholder Contributor', excerpt: 'A short documentary on Blackberry Farm — the swim parties, the picnics, the meaning of summer.' },
+  { id: 'a06', type: 'audio',  title: 'Three generations, <em>one kitchen</em>',           tag: 'Audio · 41:08',  date: 'Roundtable',     cat: 'family',    era: '1958—Now',  narrator: 'Placeholder Family',     excerpt: 'A grandmother, mother, and daughter — same kitchen table, three Cupertinos.' },
+  { id: 'a07', type: 'photo',  title: 'Main Street, <em>year by year</em>',                tag: 'Photo Series',   date: 'Series',         cat: 'business',  era: '1940s—2020s', narrator: 'Composite Archive',    excerpt: 'A photographic walk down Stevens Creek Boulevard, decade by decade, assembled from family albums.' },
+  { id: 'a08', type: 'video',  title: 'Monta Vista <em>then</em>',                         tag: 'Video · 12:33',  date: 'Interview',      cat: 'school',    era: '1976—1980', narrator: 'Class of 1980',          excerpt: 'Alumni return to walk the halls they remember — and the ones they no longer recognize.' },
+  { id: 'a09', type: 'doc',    title: 'Letters from the orchard',                           tag: 'Letters',        date: 'Family Papers',  cat: 'family',    era: '1934—1948', narrator: 'Estate of placeholder',  excerpt: 'Correspondence between an orchard owner and his daughter, preserved in a shoebox for seventy years.' },
+  { id: 'a10', type: 'photo',  title: 'The first <em>Apple campus</em>',                   tag: 'Photograph',     date: 'Industrial',     cat: 'business',  era: '1993',      narrator: 'Placeholder contributor', excerpt: 'The Infinite Loop site captured before it had a name everyone would know.' },
+  { id: 'a11', type: 'audio',  title: "My family's store on <em>Pasita</em>",              tag: 'Audio · 19:55',  date: 'Oral History',   cat: 'business',  era: '1968—1992', narrator: 'Placeholder Narrator',   excerpt: 'The corner grocery that served three generations of one neighborhood.' },
+  { id: 'a12', type: 'video',  title: 'Lunar New Year, 1985',                               tag: 'Video · 9:14',   date: 'Home Video',     cat: 'family',    era: '1985',      narrator: 'Donated by family',      excerpt: 'A digitized home movie shared by a Cupertino family who arrived from Taiwan in 1979.' },
+];
+
+function renderFeatured() {
+  const list = document.getElementById('featured-list');
+  const featured = [archiveItems[0], archiveItems[1], archiveItems[4], archiveItems[6], archiveItems[8]];
+  list.innerHTML = featured.map(item => `
+    <div class="featured-row" data-id="${item.id}">
+      <span class="year">${item.era}</span>
+      <span class="title">${item.title}</span>
+      <span class="narrator">— ${item.narrator}</span>
+      <span class="kind ${item.type === 'video' ? 'video' : ''}">${item.tag.split('·')[0].trim()}</span>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.featured-row').forEach(row => {
+    row.addEventListener('click', () => openModal(row.dataset.id));
+  });
+}
+renderFeatured();
+
+let currentFilter = 'all';
+let currentSearch = '';
+let storiesRendered = false;
+
+function renderArchive() {
+  const grid = document.getElementById('archive-grid');
+  if (!grid) return;
+  storiesRendered = true;
+
+  const filtered = archiveItems.filter(item => {
+    const matchesFilter = currentFilter === 'all' || item.type === currentFilter || item.cat === currentFilter;
+    const matchesSearch = !currentSearch ||
+      item.title.toLowerCase().includes(currentSearch) ||
+      item.era.toLowerCase().includes(currentSearch) ||
+      item.excerpt.toLowerCase().includes(currentSearch) ||
+      item.date.toLowerCase().includes(currentSearch) ||
+      item.narrator.toLowerCase().includes(currentSearch);
+    return matchesFilter && matchesSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No stories match that search yet. Try a different term, or clear filters.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <article class="story-card" data-id="${item.id}">
+      <div class="story-image">
+        <span class="story-tag">${item.tag}</span>
+        <span class="placeholder-mark">— placeholder —</span>
+      </div>
+      <div class="story-content">
+        <div class="story-date">${item.date}</div>
+        <h3 class="story-title">${item.title}</h3>
+        <p class="story-excerpt">${item.excerpt}</p>
+        <div class="story-meta">
+          <span>${item.narrator}</span>
+          <span>${item.era}</span>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  grid.querySelectorAll('.story-card').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.id));
+  });
+}
+
+document.querySelectorAll('#filter-bar .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderArchive();
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  currentSearch = e.target.value.toLowerCase().trim();
+  renderArchive();
+});
+
+// ============ MODAL ============
+const modal = document.getElementById('modal');
+const modalClose = document.getElementById('modal-close');
+
+function openModal(id) {
+  const item = archiveItems.find(x => x.id === id);
+  if (!item) return;
+  document.getElementById('modal-tag').textContent = item.tag;
+  document.getElementById('modal-title').innerHTML = item.title;
+  document.getElementById('modal-narrator').textContent = '— ' + item.narrator;
+  document.getElementById('modal-media-label').textContent = `${item.type} placeholder · awaiting contribution`;
+  document.getElementById('modal-body').innerHTML = `
+    <p>${item.excerpt}</p>
+    <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line);">
+      Era · ${item.era} &nbsp; / &nbsp; Category · ${item.cat}
+    </p>
+    <p style="font-style: italic; color: var(--ink-mute); font-size: 0.95rem;">
+      This is a placeholder entry. Full story text, embedded media, transcript, and related items will appear here once the story is added to the archive.
+    </p>
+  `;
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// ============ TIMELINE ============
+const timelineEvents = [
+  { year: '1776',  tag: 'Pre-history',        title: 'The De Anza expedition arrives',                                 desc: "Juan Bautista de Anza's Spanish expedition passed through the valley, mapping land that had been home to the Tamien Ohlone for thousands of years.", where: 'The valley, broadly',         source: 'Anza expedition diaries' },
+  { year: '1850',  tag: 'Statehood',          title: 'California becomes a state',                                       desc: 'Statehood ushered in a wave of settlers — many of them French, Italian, and Portuguese — who would establish the orchards that defined the valley for a century.', where: 'Santa Clara County',         source: 'CA State Archives' },
+  { year: '1870s', tag: 'Naming',             title: 'A name takes root: Cupertino',                                     desc: 'A small community of farmers grew around the Stevens Creek crossroads. A French wine-merchant\'s estate gave the area its eventual name.',     where: 'Stevens Creek Rd. & Saich Way', source: 'Local newspapers' },
+  { year: '1898',  tag: 'Post Office',        title: 'Cupertino gets a post office',                                     desc: 'The "Cupertino" name was officially recognized when the U.S. Postal Service opened a branch — solidifying the community\'s identity beyond a railway stop.', where: 'Old town center',            source: 'USPS records' },
+  { year: '1924',  tag: 'Recreation',         title: 'Blackberry Farm opens',                                            desc: 'The Blackberry Farm resort opened along the creek, becoming a beloved summer destination for Bay Area families for the next several decades.', where: 'Blackberry Farm Park',       source: 'Cupertino Historical Society' },
+  { year: '1939',  tag: 'Agriculture',        title: "Peak of the 'Valley of Heart's Delight'",                          desc: "Santa Clara Valley reached its peak as the world's largest fruit-producing region. Cupertino's apricot orchards stretched from the foothills to the rail line.", where: 'Across the city',           source: 'Census of Agriculture' },
+  { year: '1955',  tag: 'Incorporation',     title: '<em>Cupertino</em> is incorporated as a city',                    desc: 'On October 10, residents voted to incorporate to fend off annexation by San Jose. The new city of about 2,500 residents covered roughly three square miles.', where: 'Citywide',                  source: 'City of Cupertino archives' },
+  { year: '1962',  tag: 'Schools',            title: 'Monta Vista High School opens',                                    desc: 'Built to serve the families flooding into new tract housing on former orchard land, Monta Vista would become a defining institution of Cupertino life.', where: 'Foothill area',              source: 'FUHSD records' },
+  { year: '1967',  tag: 'Education',          title: 'De Anza College opens',                                            desc: 'The community college opened on the former Beaulieu Vineyard ranch. Its first classes met in temporary buildings amid the old grapevines.', where: '21250 Stevens Creek Blvd.',  source: 'Foothill-De Anza District' },
+  { year: '1977',  tag: 'Industry',           title: 'Apple Computer moves to Cupertino',                                desc: "The young company moved its headquarters into a small office at 20863 Stevens Creek Boulevard, marking the city's transition from orchards to chip fabs.", where: 'Stevens Creek Blvd.',        source: 'Apple corporate history' },
+  { year: '1986',  tag: 'Heritage',           title: 'Cupertino Historical Society founded',                             desc: 'A group of longtime residents established the historical society to preserve the photographs, documents, and oral histories of the rapidly changing city.', where: 'Quinlan Community Center',  source: 'CHS records' },
+  { year: '1993',  tag: 'Architecture',      title: "Apple's <em>Infinite Loop</em> campus opens",                     desc: 'Built on land that had grown apricots a generation earlier, the campus became the most recognized address in the city for the next two decades.', where: 'Infinite Loop',              source: 'Apple corporate history' },
+  { year: '2017',  tag: 'Architecture',      title: 'Apple Park opens',                                                 desc: 'The ring-shaped "spaceship" campus opened on land that had been orchard within living memory. It would house tens of thousands of employees.', where: 'Apple Park Way',             source: 'Apple corporate history' },
+  { year: '2026',  tag: 'Today',              title: 'The archive continues',                                            desc: 'Cupertino Voices launches as an open public archive of the community\'s history, gathering interviews, photographs, and documents from generations of residents.', where: 'Online',                     source: 'This site' },
+];
+
+let tlIdx = 0;
+let timelineRendered = false;
+
+function renderTimeline(idx) {
+  timelineRendered = true;
+  tlIdx = Math.max(0, Math.min(timelineEvents.length - 1, idx));
+  const ev = timelineEvents[tlIdx];
+  document.getElementById('tl-year').textContent = ev.year;
+  document.getElementById('te-year').textContent = ev.year;
+  document.getElementById('te-tag').textContent = ev.tag;
+  document.getElementById('te-title').innerHTML = ev.title;
+  document.getElementById('te-desc').textContent = ev.desc;
+  document.getElementById('te-where').textContent = ev.where;
+  document.getElementById('te-source').textContent = ev.source;
+  document.getElementById('scrubber').value = tlIdx;
+  const pct = (tlIdx / (timelineEvents.length - 1)) * 100;
+  document.getElementById('scrubber-fill').style.width = pct + '%';
+  document.getElementById('tl-prev').disabled = tlIdx === 0;
+  document.getElementById('tl-next').disabled = tlIdx === timelineEvents.length - 1;
+}
+
+document.getElementById('scrubber').addEventListener('input', (e) => {
+  renderTimeline(parseInt(e.target.value));
+});
+document.getElementById('tl-prev').addEventListener('click', () => renderTimeline(tlIdx - 1));
+document.getElementById('tl-next').addEventListener('click', () => renderTimeline(tlIdx + 1));
+
+// ============ MAP ============
+let mapInitialized = false;
+let mapInstance = null;
+
+const locations = [
+  { name: "Stevens Creek &amp; De Anza",  lat: 37.3220, lng: -122.0322, year: "1955 — 2026",     desc: "The city's main crossroads — once orchard country, now its commercial heart." },
+  { name: "Blackberry Farm",               lat: 37.3142, lng: -122.0682, year: "1924 — Present",  desc: "Working farm turned public park — generations of summer memories." },
+  { name: "De Anza College",               lat: 37.3194, lng: -122.0454, year: "1967 — Present",  desc: "Built on the historic Beaulieu / De Anza ranch land." },
+  { name: "Monta Vista High School",       lat: 37.3198, lng: -122.0593, year: "1962 — Present",  desc: "Where generations of Cupertino students came of age." },
+  { name: "Original Crossroads",            lat: 37.3267, lng: -122.0182, year: "1880s — Now",     desc: "Where the town began — Stevens Creek Road and Saich Way." },
+  { name: "McClellan Ranch Preserve",       lat: 37.3120, lng: -122.0590, year: "1850s — Present", desc: "A working ranch turned nature preserve — Cupertino's pastoral memory." },
+];
+
+function initMap() {
+  if (mapInitialized) return;
+  mapInitialized = true;
+
+  mapInstance = L.map('map', {
+    center: [37.3220, -122.0410],
+    zoom: 13,
+    scrollWheelZoom: false,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap, © CARTO',
+    maxZoom: 19,
+  }).addTo(mapInstance);
+
+  const pinList = document.getElementById('pin-list');
+  pinList.innerHTML = '';
+
+  locations.forEach((loc, i) => {
+    const icon = L.divIcon({
+      className: 'custom-pin',
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+    });
+
+    const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(mapInstance);
+    marker.bindPopup(`
+      <div class="popup-title">${loc.name}</div>
+      <div class="popup-year">${loc.year}</div>
+      <div class="popup-desc">${loc.desc}</div>
+      <span class="popup-link" data-popup-idx="${i}">View before &amp; after →</span>
+    `);
+
+    const li = document.createElement('li');
+    li.className = 'pin-item';
+    li.innerHTML = `<h4>${loc.name}</h4><div class="year">${loc.year}</div>`;
+    li.addEventListener('click', () => {
+      mapInstance.flyTo([loc.lat, loc.lng], 16, { duration: 1.0 });
+      marker.openPopup();
+    });
+    pinList.appendChild(li);
+  });
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('.popup-link');
+    if (link) {
+      const idx = parseInt(link.dataset.popupIdx);
+      const baIdx = Math.min(idx, 2);
+      const baBtn = document.querySelector(`#ba-selector .filter-btn[data-ba="${baIdx}"]`);
+      if (baBtn) baBtn.click();
+      document.querySelector('.ba-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  setTimeout(() => mapInstance.invalidateSize(), 100);
+}
+
+// ============ BEFORE/AFTER ============
+const baPairs = [
+  {
+    beforeYear: '1955', afterYear: '2026',
+    beforeStyle: 'linear-gradient(135deg, #6d5d44 0%, #443728 50%, #2a1f15 100%)',
+    afterStyle:  'linear-gradient(135deg, #98a8b4 0%, #6c8090 50%, #455865 100%)',
+    caption: "Stevens Creek Boulevard at the De Anza intersection — once a two-lane road between apricot orchards, now the city's commercial spine."
+  },
+  {
+    beforeYear: '1970', afterYear: '2026',
+    beforeStyle: 'linear-gradient(135deg, #7a8a5a 0%, #4f5e3a 50%, #2e3a22 100%)',
+    afterStyle:  'linear-gradient(135deg, #a4b89a 0%, #6f8268 50%, #485a45 100%)',
+    caption: "Blackberry Farm in 1970, in its working-farm era — versus today's restored public park with the same iconic oak grove still standing."
+  },
+  {
+    beforeYear: '1948', afterYear: '2026',
+    beforeStyle: 'linear-gradient(135deg, #8c7548 0%, #5a4a2a 50%, #38301c 100%)',
+    afterStyle:  'linear-gradient(135deg, #b8a89a 0%, #807068 50%, #4d4540 100%)',
+    caption: "The De Anza crossroads in 1948 — the Beaulieu Vineyard winery still visible — and what occupies the same intersection now."
+  },
+];
+
+const baContainer = document.getElementById('ba-container');
+const baBefore = document.querySelector('.ba-before');
+const baAfter = document.getElementById('ba-after');
+const baSlider = document.getElementById('ba-slider');
+let isDragging = false;
+
+function setBA(idx) {
+  const pair = baPairs[idx];
+  baBefore.style.background = pair.beforeStyle;
+  baAfter.style.background = pair.afterStyle;
+  document.getElementById('ba-before-label').textContent = `Before placeholder · ${pair.beforeYear}`;
+  document.getElementById('ba-after-label').textContent = `After placeholder · ${pair.afterYear}`;
+  document.getElementById('ba-label-before').textContent = `Before · ${pair.beforeYear}`;
+  document.getElementById('ba-label-after').textContent = `After · ${pair.afterYear}`;
+  document.getElementById('ba-caption').textContent = pair.caption;
+  baAfter.style.clipPath = 'inset(0 0 0 50%)';
+  baSlider.style.left = '50%';
+}
+
+document.querySelectorAll('#ba-selector .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#ba-selector .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    setBA(parseInt(btn.dataset.ba));
+  });
+});
+
+function updateSlider(clientX) {
+  const rect = baContainer.getBoundingClientRect();
+  let pct = ((clientX - rect.left) / rect.width) * 100;
+  pct = Math.max(0, Math.min(100, pct));
+  baAfter.style.clipPath = `inset(0 0 0 ${pct}%)`;
+  baSlider.style.left = `${pct}%`;
+}
+
+baContainer.addEventListener('mousedown', (e) => { isDragging = true; updateSlider(e.clientX); });
+document.addEventListener('mousemove', (e) => { if (isDragging) updateSlider(e.clientX); });
+document.addEventListener('mouseup', () => { isDragging = false; });
+baContainer.addEventListener('touchstart', (e) => { isDragging = true; updateSlider(e.touches[0].clientX); }, { passive: true });
+document.addEventListener('touchmove', (e) => { if (isDragging) updateSlider(e.touches[0].clientX); }, { passive: true });
+document.addEventListener('touchend', () => { isDragging = false; });
+
+// ============ CONTRIBUTE ============
+document.getElementById('contribute-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const success = document.getElementById('form-success');
+  success.classList.add('show');
+  document.getElementById('form-submit').style.display = 'none';
+  setTimeout(() => {
+    e.target.querySelectorAll('input, textarea').forEach(f => f.value = '');
+  }, 200);
+});
+</script>
+
+</body>
+</html>
