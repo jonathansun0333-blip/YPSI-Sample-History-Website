@@ -1,4 +1,6 @@
 ﻿import Link from "next/link";
+import OTDSection from "../components/otd-section";
+import FeaturedStories from "../components/featured-stories";
 
 function ArrowRight() {
   return (
@@ -75,23 +77,7 @@ export default function HomePage() {
 
       {/* ── On This Day ── */}
       <section className="on-this-day">
-        <div className="otd-inner">
-          <div className="otd-date-block">
-            On This Day
-            <span className="otd-date">July 2</span>
-          </div>
-          <div className="otd-story">
-            <span className="otd-year">1898 — in Cupertino&apos;s history</span>
-            <span className="otd-text">
-              A French wine-merchant&apos;s estate at the crossroads of Stevens Creek
-              Road gave its name — Cupertino — to the surrounding community of orchard
-              farmers.
-            </span>
-          </div>
-          <Link href="/timeline" className="button button-ghost">
-            Next <ArrowRight />
-          </Link>
-        </div>
+        <OTDSection />
       </section>
 
       {/* ── Four Ways In ── */}
@@ -134,38 +120,7 @@ export default function HomePage() {
           <span className="section-label">Featured Stories</span>
           <h2>From the <em>collection</em>.</h2>
         </div>
-        <div className="story-list">
-          <article className="story-row">
-            <span className="story-year">1962—Now</span>
-            <span className="story-title">Six decades on Stelling Road</span>
-            <span className="story-author">— Placeholder Family</span>
-            <span className="story-type-badge story-type-active">Video <ArrowRight /></span>
-          </article>
-          <article className="story-row">
-            <span className="story-year">1967—1995</span>
-            <span className="story-title">The De Anza years</span>
-            <span className="story-author">— Placeholder Narrator</span>
-            <span className="story-type-badge story-type-active">Audio <ArrowRight /></span>
-          </article>
-          <article className="story-row">
-            <span className="story-year">1972—1989</span>
-            <span className="story-title">Saturdays at the farm</span>
-            <span className="story-author">— Placeholder Contributor</span>
-            <span className="story-type-badge story-type-active">Video <ArrowRight /></span>
-          </article>
-          <article className="story-row">
-            <span className="story-year">1940s—2020s</span>
-            <span className="story-title">Main Street, year by year</span>
-            <span className="story-author">— Composite Archive</span>
-            <span className="story-type-badge">Photo Series <ArrowRight /></span>
-          </article>
-          <article className="story-row">
-            <span className="story-year">1934—1948</span>
-            <span className="story-title">Letters from the orchard</span>
-            <span className="story-author">— Estate of placeholder</span>
-            <span className="story-type-badge">Letters <ArrowRight /></span>
-          </article>
-        </div>
+        <FeaturedStories />
         <div className="stories-cta">
           <Link href="/archive" className="button button-secondary">
             View all stories <ArrowRight />

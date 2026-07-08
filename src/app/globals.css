@@ -30,6 +30,31 @@ html.dark {
   --panel-fg: #ece3d4;
 }
 
+/* In dark mode, any element using --ink as a background needs dark text */
+html.dark .button-primary {
+  color: var(--surface);
+}
+
+html.dark .button-primary:hover {
+  color: var(--panel-fg); /* rust bg hover: light text is fine */
+}
+
+html.dark .button-secondary:hover {
+  color: var(--surface);
+}
+
+html.dark .ba-btn-active {
+  color: var(--surface);
+}
+
+html.dark .archive-filter-active {
+  color: var(--surface);
+}
+
+html.dark .tl-nav-btn:hover:not(:disabled) {
+  color: var(--surface);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -103,7 +128,14 @@ em {
   display: inline-block;
 }
 
-.site-header nav {
+.site-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem 1.7rem;
+  flex-wrap: wrap;
+}
+
+.site-header-right nav {
   display: flex;
   align-items: center;
   gap: 1.3rem 1.7rem;
@@ -521,7 +553,7 @@ main.home-page {
   padding: 1.6rem 0;
   border-top: 1px solid var(--line);
   cursor: pointer;
-  transition: padding-left 0.2s;
+  transition: background 0.2s, padding-left 0.2s;
   text-decoration: none;
   color: inherit;
 }
@@ -531,7 +563,8 @@ main.home-page {
 }
 
 .story-row:hover {
-  padding-left: 0.5rem;
+  background: var(--surface-2);
+  padding-left: 0.8rem;
 }
 
 .story-year {
@@ -579,6 +612,149 @@ main.home-page {
 
 .stories-cta {
   margin-bottom: 5rem;
+}
+
+/* ── Story / Archive detail modal ── */
+.story-modal-overlay,
+.archive-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(33, 28, 21, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  animation: cvFade 0.2s ease;
+}
+
+@keyframes cvFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.story-modal-panel,
+.archive-modal-panel {
+  background: var(--surface);
+  max-width: 640px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  position: relative;
+  border: 1px solid var(--line-2);
+  box-shadow: rgba(33, 28, 21, 0.5) 0px 30px 70px -25px;
+}
+
+.story-modal-close,
+.archive-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-mute);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.story-modal-close:hover,
+.archive-modal-close:hover {
+  color: var(--ink);
+}
+
+.story-modal-badge,
+.archive-modal-badge {
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 1rem;
+}
+
+.story-modal-title,
+.archive-modal-title {
+  font-family: 'Newsreader', serif;
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.story-modal-author,
+.archive-modal-author {
+  font-family: 'Newsreader', serif;
+  color: var(--ink-soft);
+  margin: 0 0 1.5rem;
+}
+
+.story-modal-media,
+.archive-modal-media {
+  aspect-ratio: 16 / 9;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(33, 28, 21, 0.05) 0 1px,
+    transparent 1px 12px
+  ), var(--surface-deep);
+  margin-bottom: 1.5rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+}
+
+.story-modal-placeholder,
+.archive-modal-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-mute);
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.story-modal-body,
+.archive-modal-body {
+  color: var(--ink-soft);
+  line-height: 1.65;
+  font-size: 1rem;
+}
+
+.story-modal-desc,
+.archive-modal-desc {
+  margin: 0 0 1rem;
+}
+
+.story-modal-meta,
+.archive-modal-meta {
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.story-modal-placeholder-note,
+.archive-modal-placeholder-note {
+  color: var(--ink-mute);
+  font-size: 0.95rem;
+  margin-top: 1rem;
 }
 
 /* ── Dark site footer ── */
@@ -1094,6 +1270,9 @@ main.home-page {
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 3rem;
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
 }
 
 .map-canvas {
@@ -1382,6 +1561,11 @@ main.home-page {
   border: 2.5px solid rgba(255,255,255,0.6) !important;
 }
 
+/* Fade transition on tile layer swap (dark/light) */
+.cv-map-tiles {
+  transition: opacity 0.4s ease;
+}
+
 .cv-popup .leaflet-popup-content-wrapper {
   background: var(--surface);
   color: var(--ink);
@@ -1418,6 +1602,198 @@ main.home-page {
   line-height: 1.5;
 }
 
+.cv-popup-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rust);
+  cursor: pointer;
+  border-bottom: 1px solid var(--rust);
+  padding-bottom: 1px;
+}
+
+/* ── Before & After section ── */
+.map-ba-section {
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0;
+  margin-bottom: 5rem;
+}
+
+.map-ba-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 3rem;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.map-ba-label {
+  flex: 0 0 200px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.map-ba-h2 {
+  flex: 1 1 320px;
+  font-family: 'Newsreader', serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.map-ba-h2 em {
+  color: var(--rust);
+  font-style: normal;
+}
+
+.ba-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ba-btn {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line-2);
+  padding: 0.5rem 1rem;
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.ba-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.ba-btn-active {
+  background: var(--ink);
+  color: var(--panel-fg);
+  border-color: var(--ink);
+}
+
+.ba-widget {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ink);
+  user-select: none;
+  cursor: ew-resize;
+}
+
+.ba-before,
+.ba-after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.ba-before {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(33, 28, 21, 0.05) 0px,
+    rgba(33, 28, 21, 0.05) 1px,
+    transparent 1px,
+    transparent 11px
+  ), rgb(207, 193, 166);
+}
+
+.ba-after {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(33, 28, 21, 0.05) 0px,
+    rgba(33, 28, 21, 0.05) 1px,
+    transparent 1px,
+    transparent 11px
+  ), rgb(196, 204, 202);
+}
+
+.ba-placeholder-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(33, 28, 21, 0.45);
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ba-label {
+  position: absolute;
+  top: 1rem;
+  padding: 0.3rem 0.7rem;
+  background: rgba(33, 28, 21, 0.88);
+  color: var(--panel-fg);
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+.ba-label-before {
+  left: 1rem;
+}
+
+.ba-label-after {
+  right: 1rem;
+}
+
+.ba-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--surface);
+  z-index: 4;
+  transform: translateX(-50%);
+}
+
+.ba-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background: var(--surface);
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.ba-caption {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin: 1.2rem 0 0;
+  max-width: 680px;
+}
+
 @media (max-width: 700px) {
   .story-page-inner,
   .about-page-inner,
@@ -1449,9 +1825,11 @@ main.home-page {
 
 /* ── Timeline page ── */
 .tl-page {
+  padding-top: 74px; /* match other pages – accounts for fixed header */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-left: 32px;
+  padding-right: 32px;
 }
 
 .tl-page-inner {
@@ -1518,6 +1896,10 @@ main.home-page {
   letter-spacing: -0.03em;
   line-height: 1;
   color: var(--rust);
+  /* Fixed width so the slider track never shifts */
+  flex: 0 0 auto;
+  min-width: 7rem;
+  text-align: left;
 }
 
 .tl-scrub-track {
@@ -1593,6 +1975,7 @@ main.home-page {
   padding: 2.5rem 0;
   margin-top: 1rem;
   align-items: start;
+  min-height: 180px; /* prevents nav buttons from jumping */
 }
 
 .tl-card-left {

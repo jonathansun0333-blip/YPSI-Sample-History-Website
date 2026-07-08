@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MapClientLoader from "../../components/map-client-loader";
+import BeforeAfter from "../../components/before-after";
 
 export const metadata: Metadata = {
   title: "Interactive Map",
@@ -22,10 +23,18 @@ export default function MapPage() {
         <p className="map-page-lead">
           Pin by pin, we are mapping the Cupertino that was — and showing how
           it became the one we know. Click any pin or list entry to fly to that
-          place.
+          place, and drag the slider below to travel between decades.
         </p>
 
         <MapClientLoader />
+
+        <section id="cv-ba" className="map-ba-section">
+          <div className="map-ba-header">
+            <span className="map-ba-label">Before &amp; After</span>
+            <h2 className="map-ba-h2">Travel between <em>eras</em>.</h2>
+          </div>
+          <BeforeAfter />
+        </section>
       </div>
     </main>
   );

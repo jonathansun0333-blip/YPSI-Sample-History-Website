@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 interface Scene {
   id: number;
@@ -44,6 +44,19 @@ export default function BeforeAfter() {
   const dragging = useRef(false);
 
   const scene = SCENES[activeScene];
+
+  // Listen for popup "View before & after" clicks from the map
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const idx = (e as CustomEvent<number>).detail;
+      if (idx >= 0 && idx < SCENES.length) {
+        setActiveScene(idx);
+        setSliderPct(50);
+      }
+    };
+    window.addEventListener("cv:select-ba-scene", handler);
+    return () => window.removeEventListener("cv:select-ba-scene", handler);
+  }, []);
 
   const updateSlider = useCallback((clientX: number) => {
     if (!containerRef.current) return;
