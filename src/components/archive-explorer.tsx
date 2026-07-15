@@ -65,6 +65,15 @@ export default function ArchiveExplorer() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [query, setQuery] = useState("");
   const [openItem, setOpenItem] = useState<ArchiveItem | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  function handleClose() {
+    setIsClosing(true);
+    setTimeout(() => {
+      setOpenItem(null);
+      setIsClosing(false);
+    }, 200);
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -154,7 +163,7 @@ export default function ArchiveExplorer() {
 
       {/* Detail modal */}
       {openItem && (
-        <div className="archive-modal-overlay" onClick={() => setOpenItem(null)}>
+        <div className={`archive-modal-overlay${isClosing ? " is-closing" : ""}`} onClick={handleClose}>
           <div
             className="archive-modal-panel"
             onClick={(e) => e.stopPropagation()}
@@ -164,7 +173,7 @@ export default function ArchiveExplorer() {
           >
             <button
               className="archive-modal-close"
-              onClick={() => setOpenItem(null)}
+              onClick={handleClose}
               aria-label="Close"
             >
               <CloseIcon />

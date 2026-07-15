@@ -116,6 +116,15 @@ function ArrowRight() {
 
 export default function FeaturedStories() {
   const [openStory, setOpenStory] = useState<Story | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  function handleClose() {
+    setIsClosing(true);
+    setTimeout(() => {
+      setOpenStory(null);
+      setIsClosing(false);
+    }, 200);
+  }
 
   return (
     <>
@@ -141,7 +150,7 @@ export default function FeaturedStories() {
 
       {/* Detail modal */}
       {openStory && (
-        <div className="story-modal-overlay" onClick={() => setOpenStory(null)}>
+        <div className={`story-modal-overlay${isClosing ? " is-closing" : ""}`} onClick={handleClose}>
           <div
             className="story-modal-panel"
             onClick={(e) => e.stopPropagation()}
@@ -151,7 +160,7 @@ export default function FeaturedStories() {
           >
             <button
               className="story-modal-close"
-              onClick={() => setOpenStory(null)}
+              onClick={handleClose}
               aria-label="Close"
             >
               <CloseIcon />

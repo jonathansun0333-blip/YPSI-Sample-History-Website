@@ -126,20 +126,25 @@ export default function TimelineExplorer() {
     <div className="tl-explorer">
       {/* Scrubber row */}
       <div className="tl-scrub-row">
-        <div className="tl-year-big">{event.year}</div>
+        <div className="tl-year-big" aria-hidden="true">
+          <span className="tl-year-sizer">1870s</span>
+          <span className="tl-year-vis">{event.year}</span>
+        </div>
         <div className="tl-scrub-track">
-          <div className="tl-track-line">
-            <div className="tl-track-fill" style={{ width: `${progress}%` }} />
+          <div className="tl-line-row">
+            <div className="tl-track-line">
+              <div className="tl-track-fill" style={{ width: `${progress}%` }} />
+            </div>
+            <input
+              type="range"
+              className="tl-scrub"
+              min={0}
+              max={EVENTS.length - 1}
+              value={index}
+              onChange={(e) => setIndex(Number(e.target.value))}
+              aria-label="Select a timeline event"
+            />
           </div>
-          <input
-            type="range"
-            className="tl-scrub"
-            min={0}
-            max={EVENTS.length - 1}
-            value={index}
-            onChange={(e) => setIndex(Number(e.target.value))}
-            aria-label="Select a timeline event"
-          />
           <div className="tl-year-labels">
             <span>1776</span>
             <span>1850</span>
