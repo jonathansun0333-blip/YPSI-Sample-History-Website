@@ -634,6 +634,16 @@ main.home-page {
   to   { opacity: 1; }
 }
 
+@keyframes cvFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.story-modal-overlay.is-closing,
+.archive-modal-overlay.is-closing {
+  animation: cvFadeOut 0.2s ease forwards;
+}
+
 .story-modal-panel,
 .archive-modal-panel {
   background: var(--surface);
@@ -1896,16 +1906,29 @@ main.home-page {
   letter-spacing: -0.03em;
   line-height: 1;
   color: var(--rust);
-  /* Fixed width so the slider track never shifts */
+  /* Grid trick: sizer span sets width from widest content; vis span overlays it */
+  display: grid;
   flex: 0 0 auto;
-  min-width: 7rem;
   text-align: left;
+}
+
+.tl-year-sizer {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.tl-year-vis {
+  grid-area: 1 / 1;
 }
 
 .tl-scrub-track {
   flex: 1 1 300px;
-  position: relative;
   padding: 1.4rem 0;
+}
+
+.tl-line-row {
+  position: relative;
+  height: 2px;
 }
 
 .tl-track-line {
@@ -1927,12 +1950,16 @@ main.home-page {
   -webkit-appearance: none;
   appearance: none;
   position: absolute;
-  inset: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
   width: 100%;
-  height: 100%;
+  height: 24px;
   margin: 0;
   background: transparent;
   cursor: pointer;
+  z-index: 1;
 }
 
 .tl-scrub::-webkit-slider-thumb {
@@ -1955,6 +1982,14 @@ main.home-page {
   border: none;
 }
 
+.tl-scrub:hover::-webkit-slider-thumb {
+  background: var(--surface-deep);
+}
+
+.tl-scrub:hover::-moz-range-thumb {
+  background: var(--surface-deep);
+}
+
 .tl-year-labels {
   display: flex;
   justify-content: space-between;
@@ -1975,7 +2010,7 @@ main.home-page {
   padding: 2.5rem 0;
   margin-top: 1rem;
   align-items: start;
-  min-height: 180px; /* prevents nav buttons from jumping */
+  min-height: 260px; /* prevents nav buttons from jumping */
 }
 
 .tl-card-left {
