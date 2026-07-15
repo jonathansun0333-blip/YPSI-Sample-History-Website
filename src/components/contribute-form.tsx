@@ -2,16 +2,41 @@
 
 import React from "react";
 
+const GOOGLE_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLScunIVUmNf42QvpOZsToB8EgtYPHdTKMbDsZwJKJ8bmPbx1Kw/viewform";
+
+const ENTRY = {
+  name:           "entry.341071235",
+  email:          "entry.1459037932",
+  submissionType: "entry.137826919",
+  message:        "entry.1090017431",
+} as const;
+
 export default function ContributeForm() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const name = (form.elements.namedItem("about-name") as HTMLInputElement).value;
-    const shareType = (form.elements.namedItem("about-type") as HTMLSelectElement).value;
-    const message = (form.elements.namedItem("about-message") as HTMLTextAreaElement).value;
-    const subject = encodeURIComponent(`${shareType} - ${name}`);
-    const body = encodeURIComponent(message);
-    window.location.href = `mailto:cupertinovoices@gmail.com?subject=${subject}&body=${body}`;
+
+    if (GOOGLE_FORM_URL.includes("REPLACE_WITH")) {
+      console.error(
+        "[ContributeForm] Google Form URL is not configured. Update GOOGLE_FORM_URL before deploying."
+      );
+      return;
+    }
+
+    const data = new FormData(e.currentTarget);
+    const name           = (data.get("name")           as string ?? "").trim();
+    const email          = (data.get("email")          as string ?? "").trim();
+    const submissionType = (data.get("submissionType") as string ?? "").trim();
+    const message        = (data.get("message")        as string ?? "").trim();
+
+    const destination = new URL(GOOGLE_FORM_URL);
+    destination.searchParams.set("usp", "pp_url");
+    destination.searchParams.set(ENTRY.name,           name);
+    destination.searchParams.set(ENTRY.email,          email);
+    destination.searchParams.set(ENTRY.submissionType, submissionType);
+    destination.searchParams.set(ENTRY.message,        message);
+
+    window.location.assign(destination.toString());
   }
 
   return (
@@ -23,9 +48,11 @@ export default function ContributeForm() {
           </label>
           <input
             id="about-name"
+            name="name"
             className="form-input"
             type="text"
             autoComplete="name"
+            required
           />
         </div>
         <div className="form-field">
@@ -34,9 +61,11 @@ export default function ContributeForm() {
           </label>
           <input
             id="about-email"
+            name="email"
             className="form-input"
             type="email"
             autoComplete="email"
+            required
           />
         </div>
       </div>
@@ -45,12 +74,12 @@ export default function ContributeForm() {
         <label className="form-label" htmlFor="about-type">
           What would you like to share?
         </label>
-        <select id="about-type" className="form-select">
-          <option>An oral history interview</option>
-          <option>Photographs or documents</option>
-          <option>A family member&apos;s story</option>
-          <option>I want to volunteer</option>
-          <option>Something else</option>
+        <select id="about-type" name="submissionType" className="form-select" required>
+          <option value="An oral history interview">An oral history interview</option>
+          <option value="Photographs or documents">Photographs or documents</option>
+          <option value="A family member's story">A family member&apos;s story</option>
+          <option value="I want to volunteer">I want to volunteer</option>
+          <option value="Something else">Something else</option>
         </select>
       </div>
 
@@ -60,6 +89,7 @@ export default function ContributeForm() {
         </label>
         <textarea
           id="about-message"
+          name="message"
           className="form-textarea"
           placeholder="A short note about what you'd like to contribute — no need to share details yet."
         />
