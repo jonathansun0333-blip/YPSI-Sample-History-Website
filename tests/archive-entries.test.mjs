@@ -8,7 +8,7 @@ import {
 
 const EXPECTED_TITLES = [
   "Vallco Before the Demolition",
-  "Growing Up on Cupertino鈥檚 Trails",
+  "Growing Up on Cupertino’s Trails",
   "From Taiwan to a Second Home",
   "Apple Park: From Proposal to Landmark",
   "Cherry Blossom Festival and Belonging",
@@ -52,6 +52,7 @@ test("contains complete, non-placeholder source fields", () => {
     slugs.add(entry.slug);
 
     for (const field of [
+      entry.slug,
       entry.mediaType,
       entry.duration,
       entry.title,
@@ -64,8 +65,18 @@ test("contains complete, non-placeholder source fields", () => {
     ]) {
       assert.equal(field.trim().length > 0, true);
       assert.doesNotMatch(field, /placeholder|awaiting contribution/i);
+      assert.doesNotMatch(field, /路|鈥|檚/);
     }
   }
+});
+
+test("preserves UTF-8 source punctuation", () => {
+  assert.equal(
+    ARCHIVE_ENTRIES[0].metadata,
+    "audio collection · ~6:00 oral history · YPSI interviews",
+  );
+  assert.equal(ARCHIVE_ENTRIES[0].era, "Early 1980s—2021");
+  assert.equal(ARCHIVE_ENTRIES[1].era, "Early 1980s—Late 1990s");
 });
 
 test("preserves the PDF category set", () => {
