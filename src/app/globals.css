@@ -919,6 +919,16 @@ main.home-page {
   padding-top: 74px;
 }
 
+.archive-page {
+  --archive-focus: var(--rust);
+  --archive-placeholder: #6f6455;
+}
+
+html.dark .archive-page {
+  --archive-focus: #b8562e;
+  --archive-placeholder: #938875;
+}
+
 .story-page-inner,
 .about-page-inner,
 .archive-page-inner,
@@ -1460,11 +1470,16 @@ main.home-page {
   border-color: var(--ink);
 }
 
+.archive-search-input::placeholder {
+  color: var(--archive-placeholder);
+  opacity: 1;
+}
+
 .archive-filter-btn:focus-visible,
 .archive-search-input:focus-visible,
 .archive-card-trigger:focus-visible,
 .archive-modal-close:focus-visible {
-  outline: 2px solid var(--rust);
+  outline: 2px solid var(--archive-focus);
   outline-offset: 3px;
 }
 
