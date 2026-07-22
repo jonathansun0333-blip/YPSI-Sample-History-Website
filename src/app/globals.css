@@ -1462,7 +1462,7 @@ main.home-page {
 
 .archive-filter-btn:focus-visible,
 .archive-search-input:focus-visible,
-.archive-card:focus-visible,
+.archive-card-trigger:focus-visible,
 .archive-modal-close:focus-visible {
   outline: 2px solid var(--rust);
   outline-offset: 3px;
@@ -1476,25 +1476,34 @@ main.home-page {
 }
 
 .archive-card {
+  position: relative;
+  width: 100%;
+}
+
+.archive-card-trigger {
   appearance: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   width: 100%;
   padding: 0;
   border: 0;
   background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
   cursor: pointer;
+}
+
+.archive-card-content {
+  height: 100%;
   display: flex;
   flex-direction: column;
   transition: transform 0.25s;
 }
 
-.archive-card:hover {
+.archive-card-trigger:hover + .archive-card-content {
   transform: translateY(-3px);
 }
 
-.archive-card:active {
+.archive-card-trigger:active + .archive-card-content {
   transform: translateY(-1px);
 }
 
@@ -1580,7 +1589,7 @@ main.home-page {
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.04em;
-  text-transform: lowercase;
+  text-transform: none;
   color: var(--ink-mute);
   overflow-wrap: anywhere;
 }
@@ -1651,8 +1660,12 @@ main.home-page {
   font-size: 0.68rem;
   line-height: 1.55;
   letter-spacing: 0.05em;
-  text-transform: lowercase;
+  text-transform: none;
   color: var(--ink-mute);
+}
+
+.archive-modal-meta {
+  text-transform: none;
 }
 
 .archive-modal-story {
@@ -1707,15 +1720,15 @@ main.home-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .archive-card,
+  .archive-card-content,
   .archive-modal-overlay,
   .archive-modal-overlay.is-closing {
     animation: none;
     transition: none;
   }
 
-  .archive-card:hover,
-  .archive-card:active {
+  .archive-card-trigger:hover + .archive-card-content,
+  .archive-card-trigger:active + .archive-card-content {
     transform: none;
   }
 }

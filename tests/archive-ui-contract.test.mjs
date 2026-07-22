@@ -7,6 +7,7 @@ const componentPath = new URL(
   import.meta.url,
 );
 const pagePath = new URL("../src/app/archive/page.tsx", import.meta.url);
+const stylesPath = new URL("../src/app/globals.css", import.meta.url);
 
 test("archive page and explorer contain no placeholder story language", async () => {
   const source = `${await readFile(componentPath, "utf8")}\n${await readFile(pagePath, "utf8")}`;
@@ -26,4 +27,48 @@ test("explorer uses finalized data, pure filtering, semantic cards, and full sto
   assert.match(source, /openItem\.story/);
   assert.match(source, /event\.key === "Escape"/);
   assert.doesNotMatch(source, /<audio|audioUrl|ModalPlaceholderIcon/);
+});
+
+test("cards use articles with dedicated native triggers and external headings", async () => {
+  const source = await readFile(componentPath, "utf8");
+  assert.match(source, /<article[\s\S]*?className="archive-card"/);
+  assert.match(source, /className="archive-card-trigger"/);
+  assert.match(source, /<h3 className="card-title">\{item\.title\}<\/h3>/);
+  assert.doesNotMatch(
+    source,
+    /<button[^>]*className="archive-card"[^>]*>/,
+  );
+});
+
+test("category controls expose a semantic filter group", async () => {
+  const source = await readFile(componentPath, "utf8");
+  assert.match(
+    source,
+    /className="archive-filter-row"[\s\S]*?role="group"[\s\S]*?aria-label="Filter archive by category"/,
+  );
+});
+
+test("modal keeps Tab and Shift+Tab focus inside its panel", async () => {
+  const source = await readFile(componentPath, "utf8");
+  assert.match(source, /modalPanelRef/);
+  assert.match(source, /event\.key === "Tab"/);
+  assert.match(source, /event\.shiftKey/);
+  assert.match(source, /querySelectorAll/);
+  assert.match(source, /ref=\{modalPanelRef\}/);
+});
+
+test("archive metadata, eras, and categories preserve stored capitalization", async () => {
+  const styles = await readFile(stylesPath, "utf8");
+  assert.match(
+    styles,
+    /\.card-metadata\s*\{[^}]*text-transform:\s*none;/s,
+  );
+  assert.match(
+    styles,
+    /\.archive-modal-metadata\s*\{[^}]*text-transform:\s*none;/s,
+  );
+  assert.match(
+    styles,
+    /\.archive-modal-meta\s*\{[^}]*text-transform:\s*none;/s,
+  );
 });

@@ -9,6 +9,8 @@ import {
 import { filterArchiveEntries } from "@/lib/filter-archive-entries";
 
 const FILTERS = ["All", ...ARCHIVE_CATEGORIES];
+const MODAL_FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function CloseIcon() {
   return (
@@ -33,6 +35,7 @@ export default function ArchiveExplorer() {
   const [openItem, setOpenItem] = useState<ArchiveEntry | null>(null);
   const [isClosing, setIsClosing] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const modalPanelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -51,7 +54,33 @@ export default function ArchiveExplorer() {
 
     const previousOverflow = document.body.style.overflow;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") handleClose();
+      if (event.key === "Escape") {
+        handleClose();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        const panel = modalPanelRef.current;
+        const focusableElements = panel?.querySelectorAll<HTMLElement>(
+          MODAL_FOCUSABLE_SELECTOR,
+        );
+
+        if (!panel || !focusableElements?.length) return;
+
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        if (!panel.contains(document.activeElement)) {
+          event.preventDefault();
+          firstFocusable.focus();
+        } else if (event.shiftKey && document.activeElement === firstFocusable) {
+          event.preventDefault();
+          lastFocusable.focus();
+        } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+          event.preventDefault();
+          firstFocusable.focus();
+        }
+      }
     };
 
     document.body.style.overflow = "hidden";
@@ -86,6 +115,7 @@ export default function ArchiveExplorer() {
       <div className="archive-controls">
         <div
           className="archive-filter-row"
+          role="group"
           aria-label="Filter archive by category"
         >
           {FILTERS.map((filter) => (
@@ -133,35 +163,41 @@ export default function ArchiveExplorer() {
       {filtered.length > 0 ? (
         <div className="archive-grid">
           {filtered.map((item) => (
-            <button
+            <article
               key={item.slug}
-              type="button"
               className="archive-card"
-              onClick={(event) => handleOpen(item, event.currentTarget)}
-              aria-label={`Open ${item.title} by ${item.narrators}`}
             >
-              <div className="card-img-area">
-                <span className="card-badge">
-                  {item.mediaType} · {item.duration}
-                </span>
-                <div className="card-source-panel">
-                  <span className="card-source-format">{item.mediaType}</span>
-                  <span className="card-source-duration">{item.duration}</span>
-                  <span className="card-source-kind">Oral history</span>
-                </div>
-              </div>
+              <button
+                type="button"
+                className="archive-card-trigger"
+                onClick={(event) => handleOpen(item, event.currentTarget)}
+                aria-label={`Open ${item.title} by ${item.narrators}`}
+              />
 
-              <div className="card-body">
-                <h3 className="card-title">{item.title}</h3>
-                <p className="card-narrators">— {item.narrators}</p>
-                <p className="card-metadata">{item.metadata}</p>
-                <p className="card-desc">{item.summary}</p>
-                <div className="card-footer">
-                  <span>Era · {item.era}</span>
-                  <span>Category · {item.category}</span>
+              <div className="archive-card-content">
+                <div className="card-img-area">
+                  <span className="card-badge">
+                    {item.mediaType} · {item.duration}
+                  </span>
+                  <div className="card-source-panel">
+                    <span className="card-source-format">{item.mediaType}</span>
+                    <span className="card-source-duration">{item.duration}</span>
+                    <span className="card-source-kind">Oral history</span>
+                  </div>
+                </div>
+
+                <div className="card-body">
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="card-narrators">— {item.narrators}</p>
+                  <p className="card-metadata">{item.metadata}</p>
+                  <p className="card-desc">{item.summary}</p>
+                  <div className="card-footer">
+                    <span>Era · {item.era}</span>
+                    <span>Category · {item.category}</span>
+                  </div>
                 </div>
               </div>
-            </button>
+            </article>
           ))}
         </div>
       ) : (
@@ -177,6 +213,7 @@ export default function ArchiveExplorer() {
           onClick={handleClose}
         >
           <div
+            ref={modalPanelRef}
             className="archive-modal-panel"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
