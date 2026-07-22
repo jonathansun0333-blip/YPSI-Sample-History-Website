@@ -6,9 +6,11 @@ const stylesPath = new URL("../src/app/globals.css", import.meta.url);
 
 function ruleBody(styles, selector) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = styles.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`));
-  assert.ok(match, `Missing CSS rule for ${selector}`);
-  return match[1];
+  const matches = [
+    ...styles.matchAll(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`, "g")),
+  ];
+  assert.ok(matches.length, `Missing CSS rule for ${selector}`);
+  return matches.at(-1)[1];
 }
 
 function declaration(rule, property) {
@@ -38,15 +40,17 @@ function contrastRatio(first, second) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-test("dark archive focus and placeholder tokens meet contrast targets", async () => {
+test("dark archive accessibility colors meet contrast targets", async () => {
   const styles = await readFile(stylesPath, "utf8");
   const darkTheme = ruleBody(styles, "html.dark");
   const darkArchive = ruleBody(styles, "html.dark .archive-page");
   const focusColor = declaration(darkArchive, "--archive-focus");
   const placeholderColor = declaration(darkArchive, "--archive-placeholder");
+  const textAccentColor = declaration(darkArchive, "--archive-text-accent");
 
   assert.match(focusColor, /^#[\da-f]{6}$/i);
   assert.match(placeholderColor, /^#[\da-f]{6}$/i);
+  assert.match(textAccentColor, /^#[\da-f]{6}$/i);
 
   for (const surfaceToken of [
     "--surface",
@@ -67,6 +71,19 @@ test("dark archive focus and placeholder tokens meet contrast targets", async ()
     `${placeholderColor} must contrast at least 4.5:1 with ${pageSurface}`,
   );
 
+  for (const surfaceToken of [
+    "--surface",
+    "--surface-2",
+    "--surface-deep",
+    "--panel",
+  ]) {
+    const surfaceColor = declaration(darkTheme, surfaceToken);
+    assert.ok(
+      contrastRatio(textAccentColor, surfaceColor) >= 4.5,
+      `${textAccentColor} must contrast at least 4.5:1 with ${surfaceToken} ${surfaceColor}`,
+    );
+  }
+
   assert.match(
     styles,
     /\.archive-filter-btn:focus-visible,\s*\.archive-search-input:focus-visible,\s*\.archive-card-trigger:focus-visible,\s*\.archive-modal-close:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--archive-focus\);/s,
@@ -75,4 +92,17 @@ test("dark archive focus and placeholder tokens meet contrast targets", async ()
   const placeholderRule = ruleBody(styles, ".archive-search-input::placeholder");
   assert.equal(declaration(placeholderRule, "color"), "var(--archive-placeholder)");
   assert.equal(declaration(placeholderRule, "opacity"), "1");
+
+  for (const selector of [
+    ".archive-accent",
+    ".card-source-duration",
+    ".archive-modal-badge",
+    ".archive-modal-story h3",
+  ]) {
+    assert.equal(
+      declaration(ruleBody(styles, selector), "color"),
+      "var(--archive-text-accent)",
+      `${selector} must use the archive text accent token`,
+    );
+  }
 });

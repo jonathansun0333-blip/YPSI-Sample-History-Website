@@ -922,11 +922,13 @@ main.home-page {
 .archive-page {
   --archive-focus: var(--rust);
   --archive-placeholder: #6f6455;
+  --archive-text-accent: var(--rust);
 }
 
 html.dark .archive-page {
   --archive-focus: #b8562e;
   --archive-placeholder: #938875;
+  --archive-text-accent: #c8734d;
 }
 
 .story-page-inner,
@@ -1389,7 +1391,7 @@ html.dark .archive-page {
 }
 
 .archive-accent {
-  color: var(--rust);
+  color: var(--archive-text-accent);
 }
 
 .archive-lead {
@@ -1578,7 +1580,7 @@ html.dark .archive-page {
 
 .card-source-duration {
   font-size: 0.95rem;
-  color: var(--rust);
+  color: var(--archive-text-accent);
 }
 
 .card-source-kind {
@@ -1683,6 +1685,10 @@ html.dark .archive-page {
   text-transform: none;
 }
 
+.archive-modal-badge {
+  color: var(--archive-text-accent);
+}
+
 .archive-modal-story {
   margin-top: 1.75rem;
   padding-top: 1.5rem;
@@ -1696,7 +1702,7 @@ html.dark .archive-page {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--rust);
+  color: var(--archive-text-accent);
 }
 
 .archive-modal-story p {
