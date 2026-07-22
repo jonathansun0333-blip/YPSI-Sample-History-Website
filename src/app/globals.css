@@ -131,12 +131,12 @@ em {
   display: inline;
 }
 
-.brand-mark {
-  width: 0.56rem;
-  height: 0.56rem;
-  background: var(--rust);
-  border-radius: 50%;
-  display: inline-block;
+.brand-mark-image {
+  width: 1.75rem;
+  height: 1.75rem;
+  object-fit: contain;
+  display: block;
+  flex: 0 0 auto;
 }
 
 .site-header-right {

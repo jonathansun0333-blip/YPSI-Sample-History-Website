@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import brandMark from "@/app/icon.png";
 
 const navigation = [
   { href: "/", label: "Home" },
@@ -35,7 +38,14 @@ export default function SiteHeader() {
   return (
     <header className="site-header">
       <Link href="/" className="site-brand">
-        <span className="brand-mark" aria-hidden="true" />
+        <Image
+          src={brandMark}
+          alt=""
+          className="brand-mark-image"
+          width={28}
+          height={28}
+          priority
+        />
         <span className="site-brand-text">Cupertino Voices</span>
       </Link>
 
