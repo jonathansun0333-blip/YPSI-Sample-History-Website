@@ -45,6 +45,10 @@ test("transitions the reserved root gutter with modal open and close", async () 
     htmlRule.groups.body,
     /transition:\s*background-color 0\.25s ease;/,
   );
+  assert.match(
+    htmlRule.groups.body,
+    /background-color:\s*var\(--surface\);/,
+  );
 
   assert.ok(modalCanvasRule?.groups?.body);
   assert.match(
@@ -55,8 +59,9 @@ test("transitions the reserved root gutter with modal open and close", async () 
   assert.ok(closingCanvasRule?.groups?.body);
   assert.match(
     closingCanvasRule.groups.body,
-    /background-color:\s*transparent;/,
+    /background-color:\s*var\(--surface\);/,
   );
+  assert.doesNotMatch(closingCanvasRule.groups.body, /transparent/);
   assert.match(
     closingCanvasRule.groups.body,
     /transition-duration:\s*0\.2s;/,

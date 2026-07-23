@@ -62,6 +62,7 @@ html.dark .tl-nav-btn:hover:not(:disabled) {
 html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  background-color: var(--surface);
   transition: background-color 0.25s ease;
 }
 
@@ -76,7 +77,7 @@ html:has(.archive-modal-overlay:not(.is-closing)) {
 
 html:has(.story-modal-overlay.is-closing),
 html:has(.archive-modal-overlay.is-closing) {
-  background-color: transparent;
+  background-color: var(--surface);
   transition-duration: 0.2s;
 }
 
