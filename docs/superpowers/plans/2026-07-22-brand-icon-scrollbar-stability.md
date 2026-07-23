@@ -14,6 +14,7 @@
 - The source is an SVG with a 658 by 652 viewport, 47,135 bytes, SHA-256 `9E653A8FE83EA0AC8E296AB3D41A7769F2AF9302271BDDE1E8D7EB1239EEC624`.
 - Copy the source without visual editing or generated replacements.
 - Keep `src/app/icon.svg` as the sole favicon source; remove `src/app/icon.png`.
+- Mark `src/app/icon.svg` as `-text` in the repository `.gitattributes` so Windows `core.autocrlf` checkouts preserve the exact approved bytes and SHA-256.
 - Replace only the orange header dot; preserve the visible “Cupertino Voices” text and its home link.
 - Render the header image in a 28-pixel-square box with its aspect ratio preserved.
 - Render the header source as `/icon.svg` through `next/image` with `unoptimized`; do not add an SVG loader, inline path duplication, or a second asset copy.
@@ -543,3 +544,82 @@ Also re-check at 800 pixels that the existing column breakpoint remains active a
 git add -- tests/site-brand.test.mjs src/app/globals.css
 git commit -m "fix: keep tablet header on one row"
 ```
+
+---
+
+### Task 5: Preserve the exact SVG bytes across Windows checkouts
+
+**Files:**
+- Create: `.gitattributes`
+- Modify: `tests/favicon.test.mjs`
+
+**Interfaces:**
+- Consumes: The exact `src/app/icon.svg` Git blob and repository checkouts with `core.autocrlf=true`.
+- Produces: A path-specific `-text` attribute that disables end-of-line conversion for the favicon.
+- Preserves: The approved 47,135-byte SVG, SHA-256, rendering, header URL, and all unrelated text-file line-ending behavior.
+
+- [ ] **Step 1: Add the failing checkout-protection contract**
+
+Update `tests/favicon.test.mjs` to read the repository attributes:
+
+```js
+const attributesUrl = new URL("../.gitattributes", import.meta.url);
+```
+
+Add:
+
+```js
+test("prevents checkout filters from changing the SVG bytes", async () => {
+  const attributes = await readFile(attributesUrl, "utf8");
+
+  assert.match(attributes, /^src\/app\/icon\.svg -text$/m);
+});
+```
+
+- [ ] **Step 2: Run the focused test and verify RED**
+
+Run:
+
+```powershell
+& 'C:\Program Files\nodejs\node.exe' --test tests/favicon.test.mjs
+```
+
+Expected: FAIL with `ENOENT` because `.gitattributes` does not exist.
+
+- [ ] **Step 3: Add the minimal path-specific attribute**
+
+Create `.gitattributes` with exactly:
+
+```gitattributes
+src/app/icon.svg -text
+```
+
+Do not disable text normalization globally or change attributes for other SVG or text files.
+
+- [ ] **Step 4: Run the focused and full automated checks**
+
+Run:
+
+```powershell
+& 'C:\Program Files\nodejs\node.exe' --test tests/favicon.test.mjs
+& 'C:\Program Files\nodejs\node.exe' --test tests/*.test.mjs
+& 'C:\Program Files\nodejs\npx.cmd' tsc --noEmit
+git diff --check
+```
+
+Expected: the focused and full suites pass, TypeScript exits 0, and the diff check is clean.
+
+- [ ] **Step 5: Commit and verify a fresh Windows checkout**
+
+```powershell
+git add -- .gitattributes tests/favicon.test.mjs
+git commit -m "fix: preserve svg bytes on checkout"
+```
+
+Create a temporary detached worktree from the committed head with the repository's `core.autocrlf=true`, then verify:
+
+- `src/app/icon.svg` is 47,135 bytes;
+- its SHA-256 is `9E653A8FE83EA0AC8E296AB3D41A7769F2AF9302271BDDE1E8D7EB1239EEC624`;
+- `node --test tests/favicon.test.mjs` passes.
+
+Remove only that exact temporary verification worktree with `git worktree remove` after the checks pass.
