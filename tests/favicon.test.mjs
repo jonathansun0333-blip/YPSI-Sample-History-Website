@@ -6,6 +6,7 @@ import test from "node:test";
 const iconUrl = new URL("../src/app/icon.svg", import.meta.url);
 const oldPngUrl = new URL("../src/app/icon.png", import.meta.url);
 const oldFaviconUrl = new URL("../src/app/favicon.ico", import.meta.url);
+const attributesUrl = new URL("../.gitattributes", import.meta.url);
 
 test("uses the supplied SVG as the sole favicon source", async () => {
   const icon = await readFile(iconUrl);
@@ -23,4 +24,10 @@ test("uses the supplied SVG as the sole favicon source", async () => {
   );
   await assert.rejects(stat(oldPngUrl), { code: "ENOENT" });
   await assert.rejects(stat(oldFaviconUrl), { code: "ENOENT" });
+});
+
+test("prevents checkout filters from changing the SVG bytes", async () => {
+  const attributes = await readFile(attributesUrl, "utf8");
+
+  assert.match(attributes, /^src\/app\/icon\.svg -text$/m);
 });
