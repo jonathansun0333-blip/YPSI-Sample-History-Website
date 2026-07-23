@@ -62,10 +62,11 @@ html.dark .tl-nav-btn:hover:not(:disabled) {
 html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  transition: background-color 0.25s ease;
 }
 
-html:has(.story-modal-overlay),
-html:has(.archive-modal-overlay) {
+html:has(.story-modal-overlay:not(.is-closing)),
+html:has(.archive-modal-overlay:not(.is-closing)) {
   background-color: color-mix(
     in srgb,
     var(--surface) 30%,
@@ -73,7 +74,12 @@ html:has(.archive-modal-overlay) {
   );
 }
 
-html,
+html:has(.story-modal-overlay.is-closing),
+html:has(.archive-modal-overlay.is-closing) {
+  background-color: transparent;
+  transition-duration: 0.2s;
+}
+
 html * {
   transition:
     background-color 0.35s ease,
@@ -1763,6 +1769,7 @@ html.dark .archive-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html,
   .archive-card-content,
   .archive-modal-overlay,
   .archive-modal-overlay.is-closing {

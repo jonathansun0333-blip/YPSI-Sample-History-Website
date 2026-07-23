@@ -30,15 +30,40 @@ test("reserves the root scrollbar gutter while preserving modal scroll lock", as
   assert.doesNotMatch(explorer, /paddingRight|position = "fixed"/);
 });
 
-test("darkens the reserved root gutter while a story modal exists", async () => {
+test("transitions the reserved root gutter with modal open and close", async () => {
   const styles = await readFile(stylesUrl, "utf8");
+  const htmlRule = styles.match(/html\s*\{(?<body>[^}]*)\}/s);
   const modalCanvasRule = styles.match(
-    /html:has\(\.story-modal-overlay\),\s*html:has\(\.archive-modal-overlay\)\s*\{(?<body>[^}]*)\}/s,
+    /html:has\(\.story-modal-overlay:not\(\.is-closing\)\),\s*html:has\(\.archive-modal-overlay:not\(\.is-closing\)\)\s*\{(?<body>[^}]*)\}/s,
+  );
+  const closingCanvasRule = styles.match(
+    /html:has\(\.story-modal-overlay\.is-closing\),\s*html:has\(\.archive-modal-overlay\.is-closing\)\s*\{(?<body>[^}]*)\}/s,
+  );
+
+  assert.ok(htmlRule?.groups?.body);
+  assert.match(
+    htmlRule.groups.body,
+    /transition:\s*background-color 0\.25s ease;/,
   );
 
   assert.ok(modalCanvasRule?.groups?.body);
   assert.match(
     modalCanvasRule.groups.body,
     /background-color:\s*color-mix\(\s*in srgb,\s*var\(--surface\) 30%,\s*rgb\(33 28 21\) 70%\s*\);/s,
+  );
+
+  assert.ok(closingCanvasRule?.groups?.body);
+  assert.match(
+    closingCanvasRule.groups.body,
+    /background-color:\s*transparent;/,
+  );
+  assert.match(
+    closingCanvasRule.groups.body,
+    /transition-duration:\s*0\.2s;/,
+  );
+
+  assert.match(
+    styles,
+    /@media \(prefers-reduced-motion: reduce\)\s*\{\s*html,\s*\.archive-card-content,[^}]*\{[^}]*transition:\s*none;/s,
   );
 });
