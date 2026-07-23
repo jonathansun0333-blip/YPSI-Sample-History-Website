@@ -5,8 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import brandMark from "@/app/icon.png";
-
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/story", label: "Our Story" },
@@ -39,12 +37,13 @@ export default function SiteHeader() {
     <header className="site-header">
       <Link href="/" className="site-brand">
         <Image
-          src={brandMark}
+          src="/icon.svg"
           alt=""
           className="brand-mark-image"
           width={28}
           height={28}
           priority
+          unoptimized
         />
         <span className="site-brand-text">Cupertino Voices</span>
       </Link>

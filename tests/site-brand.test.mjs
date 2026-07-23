@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 const headerUrl = new URL("../src/components/site-header.tsx", import.meta.url);
@@ -12,12 +12,16 @@ test("uses the favicon image as the compact header mark", async () => {
     readFile(stylesUrl, "utf8"),
   ]);
 
+  const imageMarkup = header.match(/<Image[\s\S]*?\/>/)?.[0];
+  assert.ok(imageMarkup);
   assert.match(header, /import Image from "next\/image";/);
-  assert.match(header, /import brandMark from "@\/app\/icon\.png";/);
-  assert.match(
-    header,
-    /<Image[\s\S]*?src=\{brandMark\}[\s\S]*?alt=""[\s\S]*?className="brand-mark-image"[\s\S]*?\/>/,
-  );
+  assert.doesNotMatch(header, /import brandMark from/);
+  assert.match(imageMarkup, /src="\/icon\.svg"/);
+  assert.match(imageMarkup, /alt=""/);
+  assert.match(imageMarkup, /className="brand-mark-image"/);
+  assert.match(imageMarkup, /width=\{28\}/);
+  assert.match(imageMarkup, /height=\{28\}/);
+  assert.match(imageMarkup, /unoptimized/);
   assert.match(header, /className="site-brand-text">Cupertino Voices<\/span>/);
   assert.doesNotMatch(header, /<span className="brand-mark"/);
 
@@ -29,11 +33,6 @@ test("uses the favicon image as the compact header mark", async () => {
   assert.doesNotMatch(styles, /\.brand-mark\s*\{/);
 });
 
-test("declares Next static-image types for the imported brand asset", async () => {
-  const imageTypes = await readFile(imageTypesUrl, "utf8");
-
-  assert.equal(
-    imageTypes,
-    '/// <reference types="next/image-types/global" />\n',
-  );
+test("does not retain static-image types for the removed PNG import", async () => {
+  await assert.rejects(stat(imageTypesUrl), { code: "ENOENT" });
 });
