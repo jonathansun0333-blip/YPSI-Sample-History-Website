@@ -61,6 +61,7 @@ html.dark .tl-nav-btn:hover:not(:disabled) {
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 html,
