@@ -6,16 +6,16 @@ Use the newly supplied Cupertino Voices image consistently as the site favicon a
 
 ## Source Asset
 
-- Source: `C:\Users\kchen\Downloads\image1.png`
-- Dimensions: 658 by 652 pixels
-- File size: 122,972 bytes
-- SHA-256: `D61AD30068B74EBE4FA87A3F02630DCF3109872554B2EF89467FD328A75A65D5`
+- Source: `C:\Users\kchen\Downloads\image1.svg`
+- SVG viewport: 658 by 652
+- File size: 47,135 bytes
+- SHA-256: `9E653A8FE83EA0AC8E296AB3D41A7769F2AF9302271BDDE1E8D7EB1239EEC624`
 
 The source image must be copied without visual editing or generated replacements.
 
 ## Brand Treatment
 
-The new image replaces `src/app/icon.png`, allowing the Next.js App Router to serve it as the favicon.
+The source is copied to `src/app/icon.svg`, allowing the Next.js App Router to serve it as the sole favicon at `/icon.svg`. The superseded `src/app/icon.png` is removed.
 
 The same image becomes a compact, decorative brand mark in the top-left site header:
 
@@ -25,7 +25,7 @@ The same image becomes a compact, decorative brand mark in the top-left site hea
 - use empty alternative text because the adjacent visible brand text supplies the accessible name;
 - preserve the current header height, navigation alignment, responsive behavior, and light/dark themes.
 
-The old circular `.brand-mark` element and styling will be removed. The replacement image will use a dedicated `.brand-mark-image` class.
+The old circular `.brand-mark` element and styling are removed. The replacement uses `next/image` with `src="/icon.svg"`, `unoptimized`, an empty alternative string, and the existing `.brand-mark-image` sizing class. A URL source avoids an SVG loader, inline path duplication, and a second asset copy.
 
 ## Scrollbar Stability
 
@@ -47,7 +47,9 @@ No JavaScript padding compensation, fixed-body positioning, or background-scroll
 
 Expected implementation files:
 
-- `src/app/icon.png`
+- `src/app/icon.svg`
+- remove `src/app/icon.png`
+- remove the now-unneeded `src/types/next-image.d.ts`
 - `src/components/site-header.tsx`
 - `src/app/globals.css`
 - focused tests under `tests/`
@@ -58,7 +60,8 @@ The Archive records, search/filter behavior, dialog content, navigation labels, 
 
 Automated tests will verify:
 
-- `src/app/icon.png` exactly matches the new source image;
+- `src/app/icon.svg` exactly matches the new source image;
+- the obsolete `src/app/icon.png`, its static import, and `src/types/next-image.d.ts` are absent;
 - the old orange-dot element is replaced by the image-based header mark;
 - the visible “Cupertino Voices” text remains;
 - the root stylesheet reserves a stable scrollbar gutter;
@@ -66,7 +69,7 @@ Automated tests will verify:
 
 Browser verification will confirm:
 
-- the favicon response uses the new image;
+- `/icon.svg` returns the exact source bytes with `image/svg+xml`;
 - the compact header mark is readable and aligned on desktop and mobile in light and dark themes;
 - the header navigation remains on one line at the current desktop breakpoint;
 - opening and closing an Archive story does not change measured page/header alignment;
@@ -76,7 +79,7 @@ Browser verification will confirm:
 
 ## Acceptance Criteria
 
-1. The new 658 by 652 image is the site favicon.
+1. The new SVG with a 658 by 652 viewport is the sole site favicon.
 2. The same image replaces only the top-left orange dot and sits beside the unchanged “Cupertino Voices” text.
 3. Opening an Archive story does not cause horizontal page movement in browsers with classic scrollbars.
 4. Background scrolling remains disabled while the dialog is open.
