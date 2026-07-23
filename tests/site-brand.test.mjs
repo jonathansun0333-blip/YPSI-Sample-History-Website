@@ -5,18 +5,32 @@ import test from "node:test";
 const headerUrl = new URL("../src/components/site-header.tsx", import.meta.url);
 const stylesUrl = new URL("../src/app/globals.css", import.meta.url);
 const imageTypesUrl = new URL("../src/types/next-image.d.ts", import.meta.url);
+const nextConfigUrl = new URL("../next.config.ts", import.meta.url);
 
-test("uses the favicon image as the compact header mark", async () => {
-  const [header, styles] = await Promise.all([
+test("uses the base-path-aware favicon image as the compact header mark", async () => {
+  const [header, styles, nextConfig] = await Promise.all([
     readFile(headerUrl, "utf8"),
     readFile(stylesUrl, "utf8"),
+    readFile(nextConfigUrl, "utf8"),
   ]);
 
   const imageMarkup = header.match(/<Image[\s\S]*?\/>/)?.[0];
   assert.ok(imageMarkup);
   assert.match(header, /import Image from "next\/image";/);
   assert.doesNotMatch(header, /import brandMark from/);
-  assert.match(imageMarkup, /src="\/icon\.svg"/);
+  assert.match(
+    header,
+    /const basePath = process\.env\.NEXT_PUBLIC_BASE_PATH \?\? "";/,
+  );
+  assert.match(imageMarkup, /src=\{`\$\{basePath\}\/icon\.svg`\}/);
+  assert.match(
+    nextConfig,
+    /const basePath = isProd \? "\/YPSI-Sample-History-Website" : "";/,
+  );
+  assert.match(
+    nextConfig,
+    /env:\s*\{\s*NEXT_PUBLIC_BASE_PATH:\s*basePath,\s*\}/s,
+  );
   assert.match(imageMarkup, /alt=""/);
   assert.match(imageMarkup, /className="brand-mark-image"/);
   assert.match(imageMarkup, /width=\{56\}/);
