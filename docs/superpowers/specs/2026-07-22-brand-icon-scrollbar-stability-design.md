@@ -27,6 +27,28 @@ The same image becomes a compact, decorative brand mark in the top-left site hea
 
 The old circular `.brand-mark` element and styling are removed. The replacement uses `next/image` with `src="/icon.svg"`, `unoptimized`, an empty alternative string, and the existing `.brand-mark-image` sizing class. A URL source avoids an SVG loader, inline path duplication, and a second asset copy.
 
+## Intermediate-Width Header Stability
+
+The 28-pixel mark makes the non-wrapping brand about 19 pixels wider than the original dot. The header's right-side controls may wrap, while the fixed header and page content retain a 74-pixel offset until the column layout begins at 800 pixels. Browser reproduction showed that this newly extends the two-row fixed-header state into widths where the original header remained one row.
+
+The approved correction keeps the header on one row from 801 through 900 pixels by compacting horizontal spacing only:
+
+```css
+@media (min-width: 801px) and (max-width: 900px) {
+  .site-header {
+    gap: 1.2rem 1rem;
+    padding-inline: 20px;
+  }
+
+  .site-header-right,
+  .site-header-right nav {
+    gap: 1rem;
+  }
+}
+```
+
+The rule preserves the 28-pixel icon, navigation labels, theme control, fixed-header height, 74-pixel page offset, and existing column breakpoint. It does not hide controls, shrink the approved mark, or add route-specific offsets.
+
 ## Scrollbar Stability
 
 The current Archive dialog sets `document.body.style.overflow = "hidden"` while open. In browsers with classic non-overlay scrollbars, that removes the viewport scrollbar and widens the available layout area, causing centered content and the fixed header to shift.
@@ -64,6 +86,7 @@ Automated tests will verify:
 - the obsolete `src/app/icon.png`, its static import, and `src/types/next-image.d.ts` are absent;
 - the old orange-dot element is replaced by the image-based header mark;
 - the visible “Cupertino Voices” text remains;
+- the 801-to-900-pixel compact-spacing rule is present;
 - the root stylesheet reserves a stable scrollbar gutter;
 - the existing Archive body scroll lock remains intact.
 
@@ -71,7 +94,8 @@ Browser verification will confirm:
 
 - `/icon.svg` returns the exact source bytes with `image/svg+xml`;
 - the compact header mark is readable and aligned on desktop and mobile in light and dark themes;
-- the header navigation remains on one line at the current desktop breakpoint;
+- the header navigation and theme control remain on one row at 801, 820, 834, 850, 870, and 900 pixels;
+- the fixed header retains its single-row height and the Archive content remains below it throughout that intermediate range;
 - opening and closing an Archive story does not change measured page/header alignment;
 - background scrolling is still locked while the dialog is open;
 - dialog keyboard behavior and focus return still work;
@@ -85,3 +109,4 @@ Browser verification will confirm:
 4. Background scrolling remains disabled while the dialog is open.
 5. Existing responsive, theme, navigation, Archive, and accessibility behavior remains intact.
 6. The user’s unrelated uncommitted work is preserved and unstaged.
+7. The fixed header remains one row without content overlap from 801 through 900 pixels.
