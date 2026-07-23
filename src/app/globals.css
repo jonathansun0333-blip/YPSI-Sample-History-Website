@@ -64,6 +64,15 @@ html {
   scrollbar-gutter: stable;
 }
 
+html:has(.story-modal-overlay),
+html:has(.archive-modal-overlay) {
+  background-color: color-mix(
+    in srgb,
+    var(--surface) 30%,
+    rgb(33 28 21) 70%
+  );
+}
+
 html,
 html * {
   transition:
@@ -109,7 +118,7 @@ em {
   align-items: center;
   justify-content: space-between;
   gap: 1.2rem 2rem;
-  padding: 1rem 2rem;
+  padding: 0.25rem 2rem;
   background: var(--nav-bg);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(10px);
@@ -133,8 +142,8 @@ em {
 }
 
 .brand-mark-image {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 3.5rem;
+  height: 3.5rem;
   object-fit: contain;
   display: block;
   flex: 0 0 auto;
@@ -160,7 +169,7 @@ em {
 @media (min-width: 801px) and (max-width: 900px) {
   .site-header {
     gap: 1.2rem 1rem;
-    padding-inline: 20px;
+    padding-inline: 12px;
   }
 
   .site-header-right,
@@ -918,7 +927,7 @@ main.home-page {
 
 @media (max-width: 540px) {
   .site-header {
-    padding: 1rem 20px;
+    padding-inline: 20px;
   }
 }
 

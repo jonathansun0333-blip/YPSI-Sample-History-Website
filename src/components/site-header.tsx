@@ -40,8 +40,8 @@ export default function SiteHeader() {
           src="/icon.svg"
           alt=""
           className="brand-mark-image"
-          width={28}
-          height={28}
+          width={56}
+          height={56}
           priority
           unoptimized
         />

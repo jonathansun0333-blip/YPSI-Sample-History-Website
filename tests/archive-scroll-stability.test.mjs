@@ -29,3 +29,16 @@ test("reserves the root scrollbar gutter while preserving modal scroll lock", as
   );
   assert.doesNotMatch(explorer, /paddingRight|position = "fixed"/);
 });
+
+test("darkens the reserved root gutter while a story modal exists", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+  const modalCanvasRule = styles.match(
+    /html:has\(\.story-modal-overlay\),\s*html:has\(\.archive-modal-overlay\)\s*\{(?<body>[^}]*)\}/s,
+  );
+
+  assert.ok(modalCanvasRule?.groups?.body);
+  assert.match(
+    modalCanvasRule.groups.body,
+    /background-color:\s*color-mix\(\s*in srgb,\s*var\(--surface\) 30%,\s*rgb\(33 28 21\) 70%\s*\);/s,
+  );
+});
