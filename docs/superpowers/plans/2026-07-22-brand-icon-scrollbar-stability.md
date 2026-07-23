@@ -4,7 +4,7 @@
 
 **Goal:** Replace the favicon and header dot with the newly supplied Cupertino Voices image, then eliminate Archive modal layout shift by reserving the root scrollbar gutter.
 
-**Architecture:** Keep `src/app/icon.svg` as the single source used by Next.js file-based favicon metadata and render that same URL in `SiteHeader` through an unoptimized `next/image`. Preserve the existing body scroll lock and add `scrollbar-gutter: stable` to the root `html` rule so classic scrollbar space remains reserved while a story dialog is open.
+**Architecture:** Keep `src/app/icon.svg` as the single source used by Next.js file-based favicon metadata and render that same URL in `SiteHeader` through an unoptimized `next/image`. Preserve the existing body scroll lock and add `scrollbar-gutter: stable` to the root `html` rule so classic scrollbar space remains reserved while a story dialog is open. Keep the fixed header on one row from 801 through 900 pixels with a narrowly scoped compact-spacing media rule.
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, native CSS, Node 24 built-in test runner, `next/image`, npm, agent-browser.
 
@@ -18,6 +18,8 @@
 - Render the header image in a 28-pixel-square box with its aspect ratio preserved.
 - Render the header source as `/icon.svg` through `next/image` with `unoptimized`; do not add an SVG loader, inline path duplication, or a second asset copy.
 - Preserve the current header height, desktop navigation alignment, responsive behavior, and light/dark themes.
+- From 801 through 900 pixels, keep the 28-pixel mark, navigation, and theme control on one row by using 20-pixel inline header padding, a 1rem horizontal header gap, and 1rem right-side/navigation gaps.
+- Do not move the 800-pixel column breakpoint, shrink the approved mark, hide controls, change navigation labels, or add a route-specific page offset.
 - Preserve the existing Archive body scroll lock, dialog semantics, focus behavior, animation, and content.
 - Use CSS `scrollbar-gutter: stable`; do not add JavaScript padding compensation, fixed-body positioning, or background-scroll behavior.
 - Do not modify Archive records, filters, search, dialog copy, navigation labels, footer, package files, or unrelated routes.
@@ -429,3 +431,115 @@ Confirm:
 ```
 
 Stop only the exact development-server process started in Step 3.
+
+---
+
+### Task 4: Keep the fixed header stable at intermediate tablet widths
+
+**Files:**
+- Modify: `tests/site-brand.test.mjs`
+- Modify: `src/app/globals.css:170-190`
+
+**Interfaces:**
+- Consumes: The existing fixed `.site-header`, non-wrapping `.site-brand`, wrapping `.site-header-right`, 28-pixel `.brand-mark-image`, and 800-pixel column breakpoint.
+- Produces: A compact-spacing rule active only from 801 through 900 pixels.
+- Preserves: The approved mark size, all navigation/theme controls, the 74-pixel page offset, the 800-pixel column layout, themes, and route content.
+
+- [ ] **Step 1: Add the failing intermediate-header CSS contract**
+
+Append to `tests/site-brand.test.mjs`:
+
+```js
+test("compacts header spacing between 801 and 900 pixels", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+  const query = "@media (min-width: 801px) and (max-width: 900px)";
+  const start = styles.indexOf(query);
+
+  assert.notEqual(start, -1);
+
+  const remainder = styles.slice(start);
+  const nextMedia = remainder.indexOf("\n@media", query.length);
+  const rule =
+    nextMedia === -1 ? remainder : remainder.slice(0, nextMedia);
+
+  assert.match(
+    rule,
+    /\.site-header\s*\{[^}]*gap:\s*1\.2rem 1rem;[^}]*padding-inline:\s*20px;/s,
+  );
+  assert.match(
+    rule,
+    /\.site-header-right,\s*\.site-header-right nav\s*\{[^}]*gap:\s*1rem;/s,
+  );
+  assert.doesNotMatch(rule, /\.brand-mark-image\s*\{/);
+});
+```
+
+- [ ] **Step 2: Run the focused contract and verify RED**
+
+Run:
+
+```powershell
+& 'C:\Program Files\nodejs\node.exe' --test tests/site-brand.test.mjs
+```
+
+Expected: FAIL because the 801-to-900-pixel compact-spacing media rule does not exist.
+
+- [ ] **Step 3: Add the minimal compact-spacing rule**
+
+Add to `src/app/globals.css` after the base header controls:
+
+```css
+@media (min-width: 801px) and (max-width: 900px) {
+  .site-header {
+    gap: 1.2rem 1rem;
+    padding-inline: 20px;
+  }
+
+  .site-header-right,
+  .site-header-right nav {
+    gap: 1rem;
+  }
+}
+```
+
+Do not change the `.brand-mark-image`, `.story-page`, `.about-page`, `.archive-page`, `.map-page`, or existing `@media (max-width: 800px)` rules.
+
+- [ ] **Step 4: Run focused and complete automated checks**
+
+Run:
+
+```powershell
+& 'C:\Program Files\nodejs\node.exe' --test tests/site-brand.test.mjs
+& 'C:\Program Files\nodejs\node.exe' --test tests/*.test.mjs
+& 'C:\Program Files\nodejs\npx.cmd' tsc --noEmit
+& 'C:\Program Files\nodejs\npm.cmd' run lint
+& 'C:\Program Files\nodejs\npm.cmd' run build
+```
+
+Expected:
+
+- the focused and full Node suites pass;
+- TypeScript and production build exit 0;
+- lint reproduces only the approved baseline theme-effect error plus the three existing unrelated warnings.
+
+- [ ] **Step 5: Verify the intermediate range in a live browser**
+
+Start the isolated worktree on port 3001 and measure the Archive route at widths 801, 820, 834, 850, 870, and 900 pixels, all at 1000 pixels high.
+
+At every width, verify:
+
+- `.site-header` height is less than 74 pixels;
+- `.archive-page-inner` top is at least the header bottom;
+- the navigation and `.theme-toggle` share one row;
+- `.brand-mark-image` remains 28 by 28 pixels;
+- horizontal page overflow is not positive;
+- the page has 12 Archive cards and no framework overlay or browser errors.
+
+Also re-check at 800 pixels that the existing column breakpoint remains active and the header controls remain usable.
+
+- [ ] **Step 6: Commit the tablet-header correction**
+
+```powershell
+git add -- tests/site-brand.test.mjs src/app/globals.css
+git commit -m "fix: keep tablet header on one row"
+```
