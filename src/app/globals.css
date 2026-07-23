@@ -157,6 +157,18 @@ em {
   letter-spacing: 0.01em;
 }
 
+@media (min-width: 801px) and (max-width: 900px) {
+  .site-header {
+    gap: 1.2rem 1rem;
+    padding-inline: 20px;
+  }
+
+  .site-header-right,
+  .site-header-right nav {
+    gap: 1rem;
+  }
+}
+
 .theme-toggle {
   flex: 0 0 auto;
   display: inline-flex;

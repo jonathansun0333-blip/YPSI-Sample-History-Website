@@ -36,3 +36,26 @@ test("uses the favicon image as the compact header mark", async () => {
 test("does not retain static-image types for the removed PNG import", async () => {
   await assert.rejects(stat(imageTypesUrl), { code: "ENOENT" });
 });
+
+test("compacts header spacing between 801 and 900 pixels", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+  const query = "@media (min-width: 801px) and (max-width: 900px)";
+  const start = styles.indexOf(query);
+
+  assert.notEqual(start, -1);
+
+  const remainder = styles.slice(start);
+  const nextMedia = remainder.indexOf("\n@media", query.length);
+  const rule =
+    nextMedia === -1 ? remainder : remainder.slice(0, nextMedia);
+
+  assert.match(
+    rule,
+    /\.site-header\s*\{[^}]*gap:\s*1\.2rem 1rem;[^}]*padding-inline:\s*20px;/s,
+  );
+  assert.match(
+    rule,
+    /\.site-header-right,\s*\.site-header-right nav\s*\{[^}]*gap:\s*1rem;/s,
+  );
+  assert.doesNotMatch(rule, /\.brand-mark-image\s*\{/);
+});
