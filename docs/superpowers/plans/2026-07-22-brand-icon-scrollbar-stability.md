@@ -4,42 +4,47 @@
 
 **Goal:** Replace the favicon and header dot with the newly supplied Cupertino Voices image, then eliminate Archive modal layout shift by reserving the root scrollbar gutter.
 
-**Architecture:** Keep `src/app/icon.png` as the single source used by Next.js file-based favicon metadata and import that same static asset into `SiteHeader` through `next/image`. Preserve the existing body scroll lock and add `scrollbar-gutter: stable` to the root `html` rule so classic scrollbar space remains reserved while a story dialog is open.
+**Architecture:** Keep `src/app/icon.svg` as the single source used by Next.js file-based favicon metadata and render that same URL in `SiteHeader` through an unoptimized `next/image`. Preserve the existing body scroll lock and add `scrollbar-gutter: stable` to the root `html` rule so classic scrollbar space remains reserved while a story dialog is open.
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, native CSS, Node 24 built-in test runner, `next/image`, npm, agent-browser.
 
 ## Global Constraints
 
-- Treat `C:\Users\kchen\Downloads\image1.png` as the exact source asset.
-- The source is a 658 by 652 PNG, 122,972 bytes, SHA-256 `D61AD30068B74EBE4FA87A3F02630DCF3109872554B2EF89467FD328A75A65D5`.
+- Treat `C:\Users\kchen\Downloads\image1.svg` as the exact source asset.
+- The source is an SVG with a 658 by 652 viewport, 47,135 bytes, SHA-256 `9E653A8FE83EA0AC8E296AB3D41A7769F2AF9302271BDDE1E8D7EB1239EEC624`.
 - Copy the source without visual editing or generated replacements.
+- Keep `src/app/icon.svg` as the sole favicon source; remove `src/app/icon.png`.
 - Replace only the orange header dot; preserve the visible “Cupertino Voices” text and its home link.
 - Render the header image in a 28-pixel-square box with its aspect ratio preserved.
+- Render the header source as `/icon.svg` through `next/image` with `unoptimized`; do not add an SVG loader, inline path duplication, or a second asset copy.
 - Preserve the current header height, desktop navigation alignment, responsive behavior, and light/dark themes.
 - Preserve the existing Archive body scroll lock, dialog semantics, focus behavior, animation, and content.
 - Use CSS `scrollbar-gutter: stable`; do not add JavaScript padding compensation, fixed-body positioning, or background-scroll behavior.
 - Do not modify Archive records, filters, search, dialog copy, navigation labels, footer, package files, or unrelated routes.
 - Do not modify or stage the user’s existing `src/components/contribute-form.tsx` change.
 - Use the existing npm package manager and do not regenerate `package-lock.json`.
+- Remove the obsolete PNG static import and the temporary `src/types/next-image.d.ts` declaration.
 - The existing repository-wide lint failure in `src/components/site-header.tsx` at the theme initialization effect is baseline behavior; do not refactor that unrelated logic in this task.
 
 ---
 
-### Task 1: Replace the favicon and header dot with the new image
+### Task 1: Replace the favicon and header dot with the approved SVG
 
 **Files:**
 - Modify: `tests/favicon.test.mjs`
-- Create: `tests/site-brand.test.mjs`
-- Modify: `src/app/icon.png`
-- Modify: `src/components/site-header.tsx:3-4,37-40`
-- Modify: `src/app/globals.css:117-140`
+- Modify: `tests/site-brand.test.mjs`
+- Create: `src/app/icon.svg`
+- Delete: `src/app/icon.png`
+- Delete: `src/types/next-image.d.ts`
+- Modify: `src/components/site-header.tsx:3-8,39-51`
+- Verify: `src/app/globals.css:117-142`
 
 **Interfaces:**
-- Consumes: The exact PNG at `C:\Users\kchen\Downloads\image1.png`.
-- Produces: `src/app/icon.png` as the Next.js favicon and `brandMark` static import used by `SiteHeader`.
-- Preserves: The `.site-brand` link, `.site-brand-text`, and visible “Cupertino Voices” label.
+- Consumes: The exact SVG at `C:\Users\kchen\Downloads\image1.svg`.
+- Produces: `src/app/icon.svg` as the sole Next.js favicon and `/icon.svg` as the header image URL.
+- Preserves: The `.site-brand` home link, `.site-brand-text`, visible “Cupertino Voices” label, and 28-pixel `.brand-mark-image` box.
 
-- [ ] **Step 1: Update the favicon test and add the failing header-brand contract**
+- [ ] **Step 1: Update the favicon and header-brand contracts for SVG**
 
 Replace `tests/favicon.test.mjs` with:
 
@@ -49,59 +54,60 @@ import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
-const iconUrl = new URL("../src/app/icon.png", import.meta.url);
+const iconUrl = new URL("../src/app/icon.svg", import.meta.url);
+const oldPngUrl = new URL("../src/app/icon.png", import.meta.url);
 const oldFaviconUrl = new URL("../src/app/favicon.ico", import.meta.url);
 
-test("uses the supplied 658 by 652 PNG as the sole favicon source", async () => {
+test("uses the supplied SVG as the sole favicon source", async () => {
   const icon = await readFile(iconUrl);
+  const markup = icon.toString("utf8");
 
-  assert.deepEqual(
-    [...icon.subarray(0, 8)],
-    [137, 80, 78, 71, 13, 10, 26, 10],
-  );
-  assert.equal(icon.length, 122_972);
-  assert.equal(icon.readUInt32BE(16), 658);
-  assert.equal(icon.readUInt32BE(20), 652);
+  assert.equal(icon.length, 47_135);
   assert.equal(
     createHash("sha256").update(icon).digest("hex"),
-    "d61ad30068b74ebe4fa87a3f02630dcf3109872554b2ef89467fd328a75a65d5",
+    "9e653a8fe83ea0ac8e296ab3d41a7769f2af9302271bdde1e8d7eb1239eec624",
   );
+  assert.match(markup, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
+  assert.match(
+    markup,
+    /<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="0 0 658 652" width="658" height="652">/,
+  );
+  await assert.rejects(stat(oldPngUrl), { code: "ENOENT" });
   await assert.rejects(stat(oldFaviconUrl), { code: "ENOENT" });
 });
 ```
 
-Create `tests/site-brand.test.mjs`:
+Update `tests/site-brand.test.mjs` so the header assertions are:
 
 ```js
-import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import test from "node:test";
+const imageMarkup = header.match(/<Image[\s\S]*?\/>/)?.[0];
+assert.ok(imageMarkup);
+assert.match(header, /import Image from "next\/image";/);
+assert.doesNotMatch(header, /import brandMark from/);
+assert.match(imageMarkup, /src="\/icon\.svg"/);
+assert.match(imageMarkup, /alt=""/);
+assert.match(imageMarkup, /className="brand-mark-image"/);
+assert.match(imageMarkup, /width=\{28\}/);
+assert.match(imageMarkup, /height=\{28\}/);
+assert.match(imageMarkup, /unoptimized/);
+assert.match(header, /className="site-brand-text">Cupertino Voices<\/span>/);
+assert.doesNotMatch(header, /<span className="brand-mark"/);
+```
 
-const headerUrl = new URL("../src/components/site-header.tsx", import.meta.url);
-const stylesUrl = new URL("../src/app/globals.css", import.meta.url);
+Keep the existing `.brand-mark-image` CSS assertions in that test. Add:
 
-test("uses the favicon image as the compact header mark", async () => {
-  const [header, styles] = await Promise.all([
-    readFile(headerUrl, "utf8"),
-    readFile(stylesUrl, "utf8"),
-  ]);
+```js
+const imageTypesUrl = new URL(
+  "../src/types/next-image.d.ts",
+  import.meta.url,
+);
+await assert.rejects(stat(imageTypesUrl), { code: "ENOENT" });
+```
 
-  assert.match(header, /import Image from "next\/image";/);
-  assert.match(header, /import brandMark from "@\/app\/icon\.png";/);
-  assert.match(
-    header,
-    /<Image[\s\S]*?src=\{brandMark\}[\s\S]*?alt=""[\s\S]*?className="brand-mark-image"[\s\S]*?\/>/,
-  );
-  assert.match(header, /className="site-brand-text">Cupertino Voices<\/span>/);
-  assert.doesNotMatch(header, /<span className="brand-mark"/);
+Update its import to:
 
-  const imageRule = styles.match(/\.brand-mark-image\s*\{(?<body>[^}]*)\}/s);
-  assert.ok(imageRule?.groups?.body);
-  assert.match(imageRule.groups.body, /width:\s*1\.75rem;/);
-  assert.match(imageRule.groups.body, /height:\s*1\.75rem;/);
-  assert.match(imageRule.groups.body, /object-fit:\s*contain;/);
-  assert.doesNotMatch(styles, /\.brand-mark\s*\{/);
-});
+```js
+import { readFile, stat } from "node:fs/promises";
 ```
 
 - [ ] **Step 2: Run the focused tests and verify RED**
@@ -112,47 +118,54 @@ Run:
 & 'C:\Program Files\nodejs\node.exe' --test tests/favicon.test.mjs tests/site-brand.test.mjs
 ```
 
-Expected: FAIL because `src/app/icon.png` is still the old 960 by 720 image and `SiteHeader` still renders the `.brand-mark` span.
+Expected: FAIL because `src/app/icon.svg` does not exist, `src/app/icon.png` and `src/types/next-image.d.ts` still exist, and the header still imports the PNG.
 
-- [ ] **Step 3: Verify and copy the exact binary asset**
+- [ ] **Step 3: Copy the exact SVG and remove superseded PNG artifacts**
 
 Run:
 
 ```powershell
-$source = 'C:\Users\kchen\Downloads\image1.png'
-$destination = 'F:\Personal\Code\YPSI\YPSI-Sample-History-Website\.worktrees\brand-icon-scrollbar-stability\src\app\icon.png'
+$source = 'C:\Users\kchen\Downloads\image1.svg'
+$destination = 'F:\Personal\Code\YPSI\YPSI-Sample-History-Website\.worktrees\brand-icon-scrollbar-stability\src\app\icon.svg'
+$oldPng = 'F:\Personal\Code\YPSI\YPSI-Sample-History-Website\.worktrees\brand-icon-scrollbar-stability\src\app\icon.png'
+$oldTypes = 'F:\Personal\Code\YPSI\YPSI-Sample-History-Website\.worktrees\brand-icon-scrollbar-stability\src\types\next-image.d.ts'
 
 Get-Item -LiteralPath $source
 Get-FileHash -Algorithm SHA256 -LiteralPath $source
+Get-Item -LiteralPath $oldPng,$oldTypes
 Copy-Item -LiteralPath $source -Destination $destination
+Remove-Item -LiteralPath $oldPng,$oldTypes
+Get-Item -LiteralPath $destination
 Get-FileHash -Algorithm SHA256 -LiteralPath $destination
 ```
 
-Expected: source and destination are both 122,972 bytes with SHA-256 `D61AD30068B74EBE4FA87A3F02630DCF3109872554B2EF89467FD328A75A65D5`.
+Expected: source and destination are both 47,135 bytes with SHA-256 `9E653A8FE83EA0AC8E296AB3D41A7769F2AF9302271BDDE1E8D7EB1239EEC624`; the two exact obsolete files are removed.
 
-- [ ] **Step 4: Replace the dot markup with the image**
+- [ ] **Step 4: Render the favicon URL as the compact header image**
 
-In `src/components/site-header.tsx`, add these imports:
+Keep the standard import:
 
 ```tsx
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+```
 
+Delete:
+
+```tsx
 import brandMark from "@/app/icon.png";
 ```
 
-Replace the current `.brand-mark` span inside the brand link with:
+Render:
 
 ```tsx
 <Image
-  src={brandMark}
+  src="/icon.svg"
   alt=""
   className="brand-mark-image"
   width={28}
   height={28}
   priority
+  unoptimized
 />
 ```
 
@@ -162,21 +175,9 @@ Keep this existing adjacent text unchanged:
 <span className="site-brand-text">Cupertino Voices</span>
 ```
 
-- [ ] **Step 5: Replace the orange-dot CSS with compact image sizing**
+- [ ] **Step 5: Verify compact image sizing remains exact**
 
-In `src/app/globals.css`, delete:
-
-```css
-.brand-mark {
-  width: 0.56rem;
-  height: 0.56rem;
-  background: var(--rust);
-  border-radius: 50%;
-  display: inline-block;
-}
-```
-
-Add:
+Keep this existing rule in `src/app/globals.css`:
 
 ```css
 .brand-mark-image {
@@ -187,6 +188,8 @@ Add:
   flex: 0 0 auto;
 }
 ```
+
+Confirm no `.brand-mark` orange-dot rule exists.
 
 - [ ] **Step 6: Run focused tests and static checks**
 
@@ -201,14 +204,14 @@ Run:
 Expected:
 
 - both focused tests pass;
-- TypeScript exits 0;
-- ESLint reports only the documented baseline `react-hooks/set-state-in-effect` error in the untouched theme initialization effect and no new error from the image change.
+- TypeScript exits 0 without the deleted PNG declaration;
+- ESLint reports only the documented baseline `react-hooks/set-state-in-effect` error in the untouched theme initialization effect and no new error from the SVG change.
 
-- [ ] **Step 7: Commit the brand asset and header change**
+- [ ] **Step 7: Commit the final SVG brand asset**
 
 ```powershell
-git add -- tests/favicon.test.mjs tests/site-brand.test.mjs src/app/icon.png src/components/site-header.tsx src/app/globals.css
-git commit -m "feat: update site brand icon"
+git add -- tests/favicon.test.mjs tests/site-brand.test.mjs src/app/icon.svg src/app/icon.png src/types/next-image.d.ts src/components/site-header.tsx
+git commit -m "feat: use svg site brand icon"
 ```
 
 ---
@@ -305,7 +308,7 @@ Run:
 & 'C:\Program Files\nodejs\npm.cmd' run build
 ```
 
-Expected: both commands exit 0; the build includes `/archive` and `/icon.png`.
+Expected: both commands exit 0; the build includes `/archive` and the SVG favicon metadata route.
 
 - [ ] **Step 6: Commit the scrollbar-stability change**
 
@@ -319,7 +322,9 @@ git commit -m "fix: stabilize archive modal scrollbar"
 ### Task 3: Run complete automated and browser verification
 
 **Files:**
-- Verify: `src/app/icon.png`
+- Verify: `src/app/icon.svg`
+- Verify absent: `src/app/icon.png`
+- Verify absent: `src/types/next-image.d.ts`
 - Verify: `src/components/site-header.tsx`
 - Verify: `src/app/globals.css`
 - Verify: `src/components/archive-explorer.tsx`
@@ -382,8 +387,9 @@ Expected: the page has meaningful content, 12 Archive cards, the new header imag
 
 In the browser, confirm:
 
-- the icon link is `image/png` with `sizes="658x652"`;
-- `/icon.png` returns HTTP 200, 122,972 bytes, and the specified SHA-256;
+- the icon link points to `/icon.svg`, has type `image/svg+xml`, and uses SVG-compatible sizing metadata such as `sizes="any"`;
+- `/icon.svg` returns HTTP 200, 47,135 bytes, and SHA-256 `9E653A8FE83EA0AC8E296AB3D41A7769F2AF9302271BDDE1E8D7EB1239EEC624`;
+- `/icon.png` does not resolve successfully, proving the superseded favicon is absent;
 - `.brand-mark-image` has natural dimensions 658 by 652;
 - its rendered box is 28 by 28 pixels;
 - `.site-brand-text` still reads “Cupertino Voices”;
