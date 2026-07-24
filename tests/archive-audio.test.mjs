@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir, stat } from "node:fs/promises";
 import test from "node:test";
+import { ARCHIVE_ENTRIES } from "../src/data/archive-entries.ts";
 
 const audioDirectoryUrl = new URL(
   "../public/audio/archive/",
@@ -49,4 +50,78 @@ test("stores each unique Drive recording once as validated M4A bytes", async () 
       assert.equal(bytes.subarray(4, 8).toString("ascii"), "ftyp");
     }),
   );
+});
+
+test("maps the exact ordered recordings to all 12 archive stories", () => {
+  const expectedTracksBySlug = {
+    "vallco-before-the-demolition": [
+      ["Jonathan Hwang", "/audio/archive/jonathan-hwang.m4a"],
+      ["Long Jiao", "/audio/archive/long-jiao.m4a"],
+    ],
+    "growing-up-on-cupertinos-trails": [
+      ["Jonathan Hwang", "/audio/archive/jonathan-hwang.m4a"],
+    ],
+    "from-taiwan-to-a-second-home": [
+      ["Amy Su", "/audio/archive/amy-su.m4a"],
+    ],
+    "apple-park-from-proposal-to-landmark": [
+      ["Dajao", "/audio/archive/dajao.m4a"],
+    ],
+    "cherry-blossom-festival-and-belonging": [
+      ["Michelle Kim", "/audio/archive/michelle-kim.m4a"],
+    ],
+    "closing-the-digital-and-generational-divide": [
+      ["Phil Sun", "/audio/archive/phil-sun.m4a"],
+    ],
+    "building-for-west-valley-community-services": [
+      ["Garrett Kai", "/audio/archive/garrett-kai.m4a"],
+    ],
+    "biking-to-the-library-with-my-son": [
+      ["David Ranslan", "/audio/archive/david-ranslan.m4a"],
+    ],
+    "a-childhood-summer-at-the-library-fountains": [
+      ["Hannie Du", "/audio/archive/hannie-du.m4a"],
+    ],
+    "the-library-fish-tank": [
+      ["Tony Fei", "/audio/archive/tony-fei.m4a"],
+      ["Jonathan Hwang", "/audio/archive/jonathan-hwang.m4a"],
+      ["Yona Lee", "/audio/archive/yona-lee.m4a"],
+    ],
+    "the-cost-of-staying-in-cupertino": [
+      ["Peter Choo", "/audio/archive/peter-choo.m4a"],
+      ["Nicole Fan", "/audio/archive/nicole-fan.m4a"],
+      ["David Ranslan", "/audio/archive/david-ranslan.m4a"],
+      [
+        "Kai Kunurat and family",
+        "/audio/archive/kai-kunurat-family.m4a",
+      ],
+      ["Ben Dong", "/audio/archive/ben-dong.m4a"],
+    ],
+    "a-city-chosen-for-its-schools": [
+      ["Michael Hung", "/audio/archive/michael-hung.m4a"],
+      ["Zhao Han Xu", "/audio/archive/zhao-han-xu.m4a"],
+      ["Phil Sun", "/audio/archive/phil-sun.m4a"],
+      [
+        "Long-time Cupertino resident",
+        "/audio/archive/cupertino-25-year-resident.m4a",
+      ],
+      [
+        "Cupertino parent",
+        "/audio/archive/cupertino-parent-schools.m4a",
+      ],
+    ],
+  };
+  const actualTracksBySlug = Object.fromEntries(
+    ARCHIVE_ENTRIES.map((entry) => [
+      entry.slug,
+      entry.audioTracks?.map((track) => [track.label, track.src]),
+    ]),
+  );
+  const allTracks = ARCHIVE_ENTRIES.flatMap(
+    (entry) => entry.audioTracks ?? [],
+  );
+
+  assert.deepEqual(actualTracksBySlug, expectedTracksBySlug);
+  assert.equal(allTracks.length, 23);
+  assert.equal(new Set(allTracks.map((track) => track.src)).size, 19);
 });
