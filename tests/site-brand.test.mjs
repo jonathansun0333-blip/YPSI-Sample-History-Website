@@ -17,12 +17,13 @@ test("uses the base-path-aware favicon image as the compact header mark", async 
   const imageMarkup = header.match(/<Image[\s\S]*?\/>/)?.[0];
   assert.ok(imageMarkup);
   assert.match(header, /import Image from "next\/image";/);
+  assert.match(header, /import \{ withBasePath \} from "@\/lib\/asset-path";/);
   assert.doesNotMatch(header, /import brandMark from/);
-  assert.match(
+  assert.doesNotMatch(
     header,
     /const basePath = process\.env\.NEXT_PUBLIC_BASE_PATH \?\? "";/,
   );
-  assert.match(imageMarkup, /src=\{`\$\{basePath\}\/icon\.svg`\}/);
+  assert.match(imageMarkup, /src=\{withBasePath\("\/icon\.svg"\)\}/);
   assert.match(
     nextConfig,
     /const basePath = isProd \? "\/YPSI-Sample-History-Website" : "";/,

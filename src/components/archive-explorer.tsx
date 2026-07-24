@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArchiveAudioPlayer } from "@/components/archive-audio-player";
 import {
   ARCHIVE_CATEGORIES,
   ARCHIVE_ENTRIES,
@@ -244,6 +245,9 @@ export default function ArchiveExplorer() {
               <p id="archive-modal-summary" className="archive-modal-desc">
                 {openItem.summary}
               </p>
+              {openItem.audioTracks?.length ? (
+                <ArchiveAudioPlayer tracks={openItem.audioTracks} />
+              ) : null}
               <p className="archive-modal-meta">
                 Era · {openItem.era} &nbsp;/&nbsp; Category · {openItem.category}
               </p>

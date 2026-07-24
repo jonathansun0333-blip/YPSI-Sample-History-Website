@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+import { withBasePath } from "@/lib/asset-path";
 
 const navigation = [
   { href: "/", label: "Home" },
@@ -39,7 +38,7 @@ export default function SiteHeader() {
     <header className="site-header">
       <Link href="/" className="site-brand">
         <Image
-          src={`${basePath}/icon.svg`}
+          src={withBasePath("/icon.svg")}
           alt=""
           className="brand-mark-image"
           width={56}

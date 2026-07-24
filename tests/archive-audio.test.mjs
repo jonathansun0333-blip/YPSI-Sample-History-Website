@@ -125,3 +125,33 @@ test("maps the exact ordered recordings to all 12 archive stories", () => {
   assert.equal(allTracks.length, 23);
   assert.equal(new Set(allTracks.map((track) => track.src)).size, 19);
 });
+
+test("renders base-path-aware native audio controls in the archive modal", async () => {
+  const [player, explorer, helper] = await Promise.all([
+    readFile(
+      new URL("../src/components/archive-audio-player.tsx", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../src/components/archive-explorer.tsx", import.meta.url),
+      "utf8",
+    ),
+    readFile(new URL("../src/lib/asset-path.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(player, /<section className="archive-audio"/);
+  assert.match(player, /<audio[\s\S]*?\bcontrols\b[\s\S]*?preload="metadata"/);
+  assert.doesNotMatch(player, /\bautoPlay\b/);
+  assert.match(player, /<source[\s\S]*?type="audio\/mp4"/);
+  assert.match(player, /src=\{withBasePath\(track\.src\)\}/);
+  assert.match(helper, /process\.env\.NEXT_PUBLIC_BASE_PATH\s*\?\?\s*""/);
+  assert.match(explorer, /import \{ ArchiveAudioPlayer \}/);
+
+  const summaryIndex = explorer.indexOf('id="archive-modal-summary"');
+  const playerIndex = explorer.indexOf("<ArchiveAudioPlayer");
+  const metadataIndex = explorer.indexOf('className="archive-modal-meta"');
+
+  assert.ok(summaryIndex >= 0);
+  assert.ok(playerIndex > summaryIndex);
+  assert.ok(metadataIndex > playerIndex);
+});

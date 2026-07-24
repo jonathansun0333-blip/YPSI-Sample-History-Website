@@ -26,7 +26,13 @@ test("explorer uses finalized data, pure filtering, semantic cards, and full sto
   assert.match(source, /<button/);
   assert.match(source, /openItem\.story/);
   assert.match(source, /event\.key === "Escape"/);
-  assert.doesNotMatch(source, /<audio|audioUrl|ModalPlaceholderIcon/);
+  assert.doesNotMatch(source, /audioUrl|ModalPlaceholderIcon/);
+
+  const listing = source.slice(
+    source.indexOf('<div className="archive-controls">'),
+    source.indexOf("{openItem && ("),
+  );
+  assert.doesNotMatch(listing, /<audio|ArchiveAudioPlayer/);
 });
 
 test("cards use articles with dedicated native triggers and external headings", async () => {
