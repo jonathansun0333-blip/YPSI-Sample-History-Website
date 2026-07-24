@@ -155,3 +155,38 @@ test("renders base-path-aware native audio controls in the archive modal", async
   assert.ok(playerIndex > summaryIndex);
   assert.ok(metadataIndex > playerIndex);
 });
+
+test("styles audio controls as a responsive part of the existing modal", async () => {
+  const styles = await readFile(
+    new URL("../src/app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(styles, /\.archive-audio\s*\{[^}]*margin:\s*2rem 0;/s);
+  assert.match(
+    styles,
+    /\.archive-audio h3,\s*\.archive-modal-story h3\s*\{[^}]*font-family:\s*'Archivo', sans-serif;[^}]*text-transform:\s*uppercase;[^}]*color:\s*var\(--archive-text-accent\);/s,
+  );
+  assert.match(
+    styles,
+    /\.archive-audio-tracks\s*\{[^}]*display:\s*grid;[^}]*gap:\s*1\.25rem;/s,
+  );
+  assert.match(
+    styles,
+    /\.archive-audio-track \+ \.archive-audio-track\s*\{[^}]*border-top:\s*1px solid var\(--line\);/s,
+  );
+  assert.match(
+    styles,
+    /\.archive-audio-label\s*\{[^}]*font-family:\s*'Archivo', sans-serif;[^}]*font-size:\s*0\.75rem;/s,
+  );
+  assert.match(
+    styles,
+    /\.archive-audio audio\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*100%;/s,
+  );
+
+  const audioStyles = styles.slice(
+    styles.indexOf(".archive-audio {"),
+    styles.indexOf(".archive-modal-story p"),
+  );
+  assert.doesNotMatch(audioStyles, /box-shadow|background(?:-color)?:/);
+});

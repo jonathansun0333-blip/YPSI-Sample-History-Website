@@ -1718,12 +1718,11 @@ html.dark .archive-page {
   color: var(--archive-text-accent);
 }
 
-.archive-modal-story {
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
+.archive-audio {
+  margin: 2rem 0;
 }
 
+.archive-audio h3,
 .archive-modal-story h3 {
   margin: 0 0 0.75rem;
   font-family: 'Archivo', sans-serif;
@@ -1732,6 +1731,36 @@ html.dark .archive-page {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--archive-text-accent);
+}
+
+.archive-audio-tracks {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.archive-audio-track + .archive-audio-track {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.archive-audio-label {
+  margin: 0 0 0.5rem;
+  color: var(--ink-soft);
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.archive-audio audio {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.archive-modal-story {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
 }
 
 .archive-modal-story p {
