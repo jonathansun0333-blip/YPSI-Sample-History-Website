@@ -11,7 +11,7 @@ import { filterArchiveEntries } from "@/lib/filter-archive-entries";
 
 const FILTERS = ["All", ...ARCHIVE_CATEGORIES];
 const MODAL_FOCUSABLE_SELECTOR =
-  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), audio[controls], [tabindex]:not([tabindex="-1"])';
 
 function CloseIcon() {
   return (

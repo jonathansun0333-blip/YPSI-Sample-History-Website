@@ -61,6 +61,7 @@ test("modal keeps Tab and Shift+Tab focus inside its panel", async () => {
   assert.match(source, /event\.shiftKey/);
   assert.match(source, /querySelectorAll/);
   assert.match(source, /ref=\{modalPanelRef\}/);
+  assert.match(source, /audio\[controls\]/);
 });
 
 test("archive metadata, eras, and categories preserve stored capitalization", async () => {
