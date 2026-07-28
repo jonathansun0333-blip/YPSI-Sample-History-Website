@@ -16,14 +16,16 @@ its width, usable text width, typography, controls, or behavior.
   retaining `2rem` horizontal padding.
 - Reduce the mobile content minimum height from `14rem` to approximately
   `9.8rem`.
-- Continue allowing content to determine the final height. Longer facts may
-  expand the panel rather than being clipped or truncated.
+- Reserve the height of the tallest supplied fact at each responsive width
+  so navigating between short and long facts never resizes the panel.
+- Use overlapped, hidden, accessibility-excluded copies of the supplied
+  facts as responsive size probes rather than clipping or truncating text.
 
 ## Scope
 
-This is a CSS-only layout adjustment. It does not change the fact data,
-carousel state, navigation, animation, accessibility semantics, typography,
-or responsive column arrangement.
+This is a component and CSS layout adjustment. It does not change the fact
+data, carousel state, navigation, animation, typography, or responsive
+column arrangement. Size probes are excluded from the accessibility tree.
 
 ## Verification
 
@@ -33,3 +35,5 @@ or responsive column arrangement.
 - Run lint and TypeScript checks.
 - Build the production static export.
 - Confirm the carousel width rules remain unchanged and no text is clipped.
+- Confirm the shortest and longest supplied facts render at identical panel
+  heights on desktop and mobile.

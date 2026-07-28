@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/fix-next-static-export-rsc-paths.mjs",
     "start": "next start",
     "lint": "eslint"
   },

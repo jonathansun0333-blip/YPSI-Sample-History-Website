@@ -1,56 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
-interface OTDEvent {
-  year: string;
-  text: string;
+import {
+  CUPERTINO_FACTS,
+  type CupertinoFact,
+} from "@/data/cupertino-facts";
+import {
+  advanceFactCarousel,
+  createFactCarouselState,
+  getActiveFactId,
+  parseStoredFactCarouselState,
+  retreatFactCarousel,
+  type FactCarouselState,
+} from "@/lib/cupertino-fact-carousel";
+
+const FACT_CAROUSEL_STORAGE_KEY = "cupertino-fact-carousel-state-v1";
+const EXIT_DURATION_MS = 220;
+const ENTER_DURATION_MS = 280;
+
+type Direction = "left" | "right";
+type AnimationPhase = "idle" | "exiting" | "entering";
+
+interface AnimationState {
+  direction: Direction;
+  phase: AnimationPhase;
 }
 
-const EVENTS: OTDEvent[] = [
-  {
-    year: "1776",
-    text: "The De Anza expedition crossed the valley that would one day take its name, mapping land that had been Tamien Ohlone territory for thousands of years.",
-  },
-  {
-    year: "1850",
-    text: "California became the 31st U.S. state, opening the door to a wave of settlers — including French, Italian, and Portuguese immigrants — into what was then ranchero land.",
-  },
-  {
-    year: "1898",
-    text: "A French wine-merchant's estate at the crossroads of Stevens Creek Road gave its name — Cupertino — to the surrounding community of orchard farmers.",
-  },
-  {
-    year: "1924",
-    text: "The original Blackberry Farm Resort opened along Stevens Creek, becoming a beloved summer destination for generations of Bay Area families.",
-  },
-  {
-    year: "1955",
-    text: "Cupertino was incorporated as a city on October 10, with a population of about 2,500. Most residents still farmed apricots or worked the canneries.",
-  },
-  {
-    year: "1967",
-    text: "De Anza College opened its doors on the former Beaulieu Vineyard ranch — its first classes meeting in temporary buildings amid the old grapevines.",
-  },
-  {
-    year: "1977",
-    text: "Apple Computer moved its headquarters to Cupertino, occupying a small office at 20863 Stevens Creek Boulevard.",
-  },
-  {
-    year: "1993",
-    text: "Apple's 'Infinite Loop' campus opened on the former site of an apricot orchard, becoming the city's most recognized address.",
-  },
-  {
-    year: "2017",
-    text: "Apple Park — the ring-shaped \"spaceship\" campus — opened on land that had grown apricots within living memory of many Cupertino residents.",
-  },
-];
+const FACTS_BY_ID = new Map<string, CupertinoFact>(
+  CUPERTINO_FACTS.map((fact) => [fact.id, fact]),
+);
 
-function RefreshIcon() {
+function ArrowIcon({ direction }: { direction: Direction }) {
+  const points =
+    direction === "left" ? "10 6 4 12 10 18" : "14 6 20 12 14 18";
+
   return (
     <svg
-      width="13"
-      height="13"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -59,33 +47,268 @@ function RefreshIcon() {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M21 12a9 9 0 1 1-3-6.7" />
-      <path d="M21 3v5h-5" />
+      <polyline points={points} />
+      <path d={direction === "left" ? "M4 12h16" : "M20 12H4"} />
     </svg>
   );
 }
 
+function getAnimationClass({
+  direction,
+  phase,
+}: AnimationState): string {
+  if (phase === "idle") return "";
+  if (phase === "exiting") {
+    return direction === "right"
+      ? "fact-slide-exit-left"
+      : "fact-slide-exit-right";
+  }
+
+  return direction === "right"
+    ? "fact-slide-enter-right"
+    : "fact-slide-enter-left";
+}
+
+const FactContentSizeProbes = memo(function FactContentSizeProbes() {
+  return CUPERTINO_FACTS.map((fact) => (
+    <div
+      key={`size-probe-${fact.id}`}
+      className="fact-content fact-content-sizer"
+      aria-hidden="true"
+    >
+      <span className="fact-eyebrow">Did you know?</span>
+      <span className="fact-meta">
+        {fact.year} — {fact.category}
+      </span>
+      <span className="fact-text">{fact.text}</span>
+    </div>
+  ));
+});
+
 export default function OTDSection() {
-  const [index, setIndex] = useState(0);
+  const [carouselState, setCarouselState] =
+    useState<FactCarouselState | null>(null);
+  const [animation, setAnimation] = useState<AnimationState>({
+    direction: "right",
+    phase: "idle",
+  });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const timerIds = useRef<number[]>([]);
+  const animationLock = useRef(false);
 
-  const event = EVENTS[index];
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      let restoredState: FactCarouselState | null = null;
 
-  function handleNext() {
-    setIndex((i) => (i + 1) % EVENTS.length);
+      try {
+        const storedState = window.sessionStorage.getItem(
+          FACT_CAROUSEL_STORAGE_KEY,
+        );
+
+        if (storedState) {
+          restoredState = parseStoredFactCarouselState(
+            storedState,
+            CUPERTINO_FACTS,
+          );
+        }
+      } catch {
+        restoredState = null;
+      }
+
+      setCarouselState(
+        restoredState ?? createFactCarouselState(CUPERTINO_FACTS),
+      );
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
+
+  useEffect(() => {
+    if (!carouselState) return;
+
+    try {
+      window.sessionStorage.setItem(
+        FACT_CAROUSEL_STORAGE_KEY,
+        JSON.stringify(carouselState),
+      );
+    } catch {
+      // Storage can be unavailable in privacy modes; the carousel still works.
+    }
+  }, [carouselState]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () =>
+      setPrefersReducedMotion(mediaQuery.matches);
+    const frameId = window.requestAnimationFrame(updatePreference);
+
+    mediaQuery.addEventListener("change", updatePreference);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      mediaQuery.removeEventListener("change", updatePreference);
+    };
+  }, []);
+
+  useEffect(
+    () => () => {
+      timerIds.current.forEach((timerId) => window.clearTimeout(timerId));
+      animationLock.current = false;
+    },
+    [],
+  );
+
+  const isAnimating = animation.phase !== "idle";
+  const historyIndex = carouselState?.historyIndex ?? 0;
+  const activeFactId = carouselState
+    ? getActiveFactId(carouselState)
+    : undefined;
+  const activeFact = activeFactId
+    ? FACTS_BY_ID.get(activeFactId)
+    : undefined;
+
+  function startNavigation(direction: Direction) {
+    if (!carouselState || animationLock.current) return;
+    if (direction === "left" && carouselState.historyIndex === 0) return;
+    if (direction === "right" && CUPERTINO_FACTS.length <= 1) return;
+
+    animationLock.current = true;
+    setAnimation({ direction, phase: "exiting" });
+
+    const exitDuration = prefersReducedMotion ? 1 : EXIT_DURATION_MS;
+    const enterDuration = prefersReducedMotion ? 1 : ENTER_DURATION_MS;
+    const exitTimerId = window.setTimeout(() => {
+      setCarouselState((current) => {
+        if (!current) return current;
+
+        return direction === "right"
+          ? advanceFactCarousel(current, CUPERTINO_FACTS)
+          : retreatFactCarousel(current);
+      });
+      setAnimation({ direction, phase: "entering" });
+
+      const enterTimerId = window.setTimeout(() => {
+        animationLock.current = false;
+        setAnimation({ direction, phase: "idle" });
+      }, enterDuration);
+
+      timerIds.current.push(enterTimerId);
+    }, exitDuration);
+
+    timerIds.current.push(exitTimerId);
+  }
+
+  if (CUPERTINO_FACTS.length === 0) {
+    return (
+      <div className="fact-carousel">
+        <button
+          type="button"
+          className="fact-arrow fact-arrow-left"
+          aria-label="Show previous Cupertino fact"
+          disabled
+        >
+          <ArrowIcon direction="left" />
+        </button>
+
+        <div className="fact-content-stage">
+          <div
+            className="fact-content"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span className="fact-eyebrow">Did you know?</span>
+            <span className="fact-meta">History archive unavailable</span>
+            <span className="fact-text">
+              No Cupertino facts are available right now.
+            </span>
+          </div>
+          <FactContentSizeProbes />
+        </div>
+
+        <button
+          type="button"
+          className="fact-arrow fact-arrow-right"
+          aria-label="Show next Cupertino fact"
+          disabled
+        >
+          <ArrowIcon direction="right" />
+        </button>
+      </div>
+    );
+  }
+
+  if (!carouselState || !activeFact) {
+    return (
+      <div className="fact-carousel" aria-busy="true">
+        <button
+          type="button"
+          className="fact-arrow fact-arrow-left"
+          aria-label="Show previous Cupertino fact"
+          disabled
+        >
+          <ArrowIcon direction="left" />
+        </button>
+
+        <div className="fact-content-stage">
+          <div className="fact-content">
+            <span className="fact-eyebrow">Did you know?</span>
+            <span className="fact-meta">Loading Cupertino history</span>
+            <span className="fact-text">
+              Preparing a fact from the city&apos;s history.
+            </span>
+          </div>
+          <FactContentSizeProbes />
+        </div>
+
+        <button
+          type="button"
+          className="fact-arrow fact-arrow-right"
+          aria-label="Show next Cupertino fact"
+          disabled
+        >
+          <ArrowIcon direction="right" />
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div className="otd-inner">
-      <div className="otd-date-block">
-        On This Day
-        <span className="otd-date">July 7</span>
+    <div className="fact-carousel">
+      <button
+        type="button"
+        className="fact-arrow fact-arrow-left"
+        onClick={() => startNavigation("left")}
+        aria-label="Show previous Cupertino fact"
+        aria-disabled={isAnimating || undefined}
+        disabled={historyIndex === 0}
+      >
+        <ArrowIcon direction="left" />
+      </button>
+
+      <div className="fact-content-stage">
+        <div
+          className={`fact-content fact-slide ${getAnimationClass(animation)}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span className="fact-eyebrow">Did you know?</span>
+          <span className="fact-meta">
+            {activeFact.year} — {activeFact.category}
+          </span>
+          <span className="fact-text">{activeFact.text}</span>
+        </div>
+        <FactContentSizeProbes />
       </div>
-      <div className="otd-story">
-        <span className="otd-year">{event.year} — in Cupertino&apos;s history</span>
-        <span className="otd-text">{event.text}</span>
-      </div>
-      <button type="button" className="button button-ghost" onClick={handleNext}>
-        Next <RefreshIcon />
+
+      <button
+        type="button"
+        className="fact-arrow fact-arrow-right"
+        onClick={() => startNavigation("right")}
+        aria-label="Show next Cupertino fact"
+        aria-disabled={isAnimating || undefined}
+        disabled={CUPERTINO_FACTS.length <= 1}
+      >
+        <ArrowIcon direction="right" />
       </button>
     </div>
   );

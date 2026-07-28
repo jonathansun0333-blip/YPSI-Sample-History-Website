@@ -56,6 +56,16 @@ test("does not retain static-image types for the removed PNG import", async () =
   await assert.rejects(stat(imageTypesUrl), { code: "ENOENT" });
 });
 
+test("restores the stored theme after first paint without synchronous effect state", async () => {
+  const header = await readFile(headerUrl, "utf8");
+
+  assert.match(
+    header,
+    /requestAnimationFrame\(\(\) => \{[\s\S]*localStorage\.getItem\("theme"\)[\s\S]*setDark\(true\)/,
+  );
+  assert.match(header, /cancelAnimationFrame\(frameId\)/);
+});
+
 test("compacts header spacing between 801 and 900 pixels", async () => {
   const styles = await readFile(stylesUrl, "utf8");
   const query = "@media (min-width: 801px) and (max-width: 900px)";

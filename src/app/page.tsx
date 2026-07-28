@@ -29,7 +29,6 @@ export default function HomePage() {
       <section className="home-hero">
         <div className="hero-meta">
           <span>A Community History of Cupertino, California</span>
-          <span>July 2, 2026</span>
         </div>
 
         <h1>
@@ -75,8 +74,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── On This Day ── */}
-      <section className="on-this-day">
+      {/* ── Cupertino fact carousel ── */}
+      <section className="fact-spotlight">
         <OTDSection />
       </section>
 

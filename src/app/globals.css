@@ -402,51 +402,88 @@ main.home-page {
   border-color: var(--panel-fg);
 }
 
-/* ── On This Day ── */
-.on-this-day {
+/* ── Cupertino fact carousel ── */
+.fact-spotlight {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 32px 4rem;
 }
 
-.otd-inner {
+.fact-carousel {
   background: var(--panel);
   color: var(--panel-fg);
-  padding: 2.4rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.6rem 2.5rem;
+  padding: 1.7rem 2.4rem;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 2rem;
   align-items: center;
+  overflow: hidden;
 }
 
-.otd-date-block {
-  flex: 0 0 auto;
-  border-right: 1px solid rgba(241, 235, 224, 0.2);
-  padding-right: 2.5rem;
+.fact-arrow {
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(241, 235, 224, 0.35);
+  background: transparent;
+  color: var(--panel-fg);
+  cursor: pointer;
+}
+
+.fact-arrow:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--panel-fg);
+  color: var(--panel);
+  border-color: var(--panel-fg);
+}
+
+.fact-arrow:focus-visible {
+  outline: 2px solid rgb(217, 138, 94);
+  outline-offset: 3px;
+}
+
+.fact-arrow:disabled,
+.fact-arrow[aria-disabled="true"] {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.fact-content-stage {
+  min-width: 0;
+  display: grid;
+}
+
+.fact-content-stage > .fact-content {
+  grid-area: 1 / 1;
+}
+
+.fact-content {
+  min-width: 0;
+  min-height: 6.3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fact-content-sizer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.fact-eyebrow {
   font-family: 'Archivo', sans-serif;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(241, 235, 224, 0.55);
+  margin-bottom: 0.8rem;
 }
 
-.otd-date {
-  display: block;
-  font-family: 'Newsreader', serif;
-  font-size: 2rem;
-  font-weight: 300;
-  color: var(--panel-fg);
-  letter-spacing: -0.02em;
-  margin-top: 0.35rem;
-  text-transform: none;
-}
-
-.otd-story {
-  flex: 1 1 320px;
-}
-
-.otd-year {
+.fact-meta {
   display: block;
   font-family: 'Archivo', sans-serif;
   font-size: 0.7rem;
@@ -457,11 +494,88 @@ main.home-page {
   margin-bottom: 0.55rem;
 }
 
-.otd-text {
+.fact-text {
   font-family: 'Newsreader', serif;
   font-size: 1.3rem;
   line-height: 1.45;
   color: var(--panel-fg);
+}
+
+.fact-slide {
+  will-change: transform, opacity;
+}
+
+.fact-slide-exit-left {
+  animation: fact-exit-left 220ms ease forwards;
+}
+
+.fact-slide-enter-right {
+  animation: fact-enter-right 280ms ease forwards;
+}
+
+.fact-slide-exit-right {
+  animation: fact-exit-right 220ms ease forwards;
+}
+
+.fact-slide-enter-left {
+  animation: fact-enter-left 280ms ease forwards;
+}
+
+@keyframes fact-exit-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(-32px);
+    opacity: 0;
+  }
+}
+
+@keyframes fact-enter-right {
+  from {
+    transform: translateX(32px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fact-exit-right {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(32px);
+    opacity: 0;
+  }
+}
+
+@keyframes fact-enter-left {
+  from {
+    transform: translateX(-32px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fact-slide-exit-left,
+  .fact-slide-enter-right,
+  .fact-slide-exit-right,
+  .fact-slide-enter-left {
+    animation-duration: 1ms;
+  }
 }
 
 /* ── Section header ── */
@@ -904,18 +1018,38 @@ main.home-page {
     padding: 4rem 20px 2.5rem;
   }
 
-  .on-this-day,
+  .fact-spotlight,
   .ways-in,
   .featured-stories {
     padding-left: 20px;
     padding-right: 20px;
   }
 
-  .otd-date-block {
-    border-right: none;
-    padding-right: 0;
-    border-bottom: 1px solid rgba(241, 235, 224, 0.2);
-    padding-bottom: 1rem;
+  .fact-carousel {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "content content"
+      "previous next";
+    gap: 1.5rem;
+    padding: 1.4rem 2rem;
+  }
+
+  .fact-content-stage {
+    grid-area: content;
+  }
+
+  .fact-content {
+    min-height: 9.8rem;
+  }
+
+  .fact-arrow-left {
+    grid-area: previous;
+    justify-self: start;
+  }
+
+  .fact-arrow-right {
+    grid-area: next;
+    justify-self: end;
   }
 
   .ways-tag,

@@ -20,11 +20,15 @@ export default function SiteHeader() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "dark") {
-      setDark(true);
-      document.documentElement.classList.add("dark");
-    }
+    const frameId = window.requestAnimationFrame(() => {
+      const stored = localStorage.getItem("theme");
+      if (stored === "dark") {
+        setDark(true);
+        document.documentElement.classList.add("dark");
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   function toggleDark() {
