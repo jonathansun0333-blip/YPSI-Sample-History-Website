@@ -13,6 +13,7 @@
   --nav-bg: rgba(241, 235, 224, 0.9);
   --panel: #211c15;
   --panel-fg: #f1ebe0;
+  --site-header-clearance: 6rem;
 }
 
 html.dark {
@@ -1303,6 +1304,7 @@ html.dark .archive-page {
 }
 
 .about-contribute {
+  position: relative;
   background: var(--panel);
   color: var(--panel-fg);
   padding: clamp(2rem, 5vw, 4rem);
@@ -1311,11 +1313,14 @@ html.dark .archive-page {
 
 .about-contribute,
 .about-contribute-anchor {
-  scroll-margin-top: 6rem;
+  scroll-margin-top: var(--site-header-clearance);
 }
 
 .about-contribute-anchor {
-  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
   height: 0;
 }
 
@@ -2565,9 +2570,19 @@ html.dark .archive-page {
 }
 
 @media (max-width: 800px) {
+  :root {
+    --site-header-clearance: 8.25rem;
+  }
+
   .site-header,
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 540px) {
+  :root {
+    --site-header-clearance: 14.5rem;
   }
 }

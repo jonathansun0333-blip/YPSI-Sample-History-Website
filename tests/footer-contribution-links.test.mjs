@@ -37,16 +37,30 @@ test("About contribution hashes share one panel position", async () => {
     readFile(stylesUrl, "utf8"),
   ]);
 
-  assert.match(about, /className="about-contribute" id="cv-contribute"/);
-  assert.match(about, /id="cv-contribute-volunteer"/);
-  assert.match(about, /id="cv-contribute-contact"/);
   assert.match(
-    styles,
-    /\.about-contribute,\s*\.about-contribute-anchor\s*\{[^}]*scroll-margin-top:\s*6rem;/s,
+    about,
+    /className="about-contribute" id="cv-contribute"[\s\S]*id="cv-contribute-volunteer"[\s\S]*id="cv-contribute-contact"/,
   );
   assert.match(
     styles,
-    /\.about-contribute-anchor\s*\{[^}]*display:\s*block;[^}]*height:\s*0;/s,
+    /\.about-contribute\s*\{[^}]*position:\s*relative;/s,
+  );
+  assert.match(styles, /:root\s*\{[^}]*--site-header-clearance:\s*6rem;/s);
+  assert.match(
+    styles,
+    /\.about-contribute,\s*\.about-contribute-anchor\s*\{[^}]*scroll-margin-top:\s*var\(--site-header-clearance\);/s,
+  );
+  assert.match(
+    styles,
+    /\.about-contribute-anchor\s*\{[^}]*position:\s*absolute;[^}]*top:\s*0;[^}]*left:\s*0;[^}]*width:\s*0;[^}]*height:\s*0;/s,
+  );
+  assert.match(
+    styles,
+    /@media \(max-width:\s*800px\)[\s\S]*:root\s*\{[^}]*--site-header-clearance:\s*8\.25rem;/s,
+  );
+  assert.match(
+    styles,
+    /@media \(max-width:\s*540px\)[\s\S]*:root\s*\{[^}]*--site-header-clearance:\s*14\.5rem;/s,
   );
 });
 

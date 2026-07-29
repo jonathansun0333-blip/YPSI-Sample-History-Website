@@ -19,6 +19,9 @@
   `withBasePath` helper.
 - Use native anchors for these three targets so same-page hash changes replace
   the previous fragment.
+- Keep all three targets on the panel's exact top edge.
+- Reserve fixed-header clearance of `6rem` by default, `8.25rem` at 800px and
+  below, and `14.5rem` at 540px and below.
 - Unknown or missing hashes fall back to “An oral history interview.”
 - Add no dependencies.
 
@@ -83,16 +86,30 @@ test("About contribution hashes share one panel position", async () => {
     readFile(stylesUrl, "utf8"),
   ]);
 
-  assert.match(about, /className="about-contribute" id="cv-contribute"/);
-  assert.match(about, /id="cv-contribute-volunteer"/);
-  assert.match(about, /id="cv-contribute-contact"/);
   assert.match(
-    styles,
-    /\.about-contribute,\s*\.about-contribute-anchor\s*\{[^}]*scroll-margin-top:\s*6rem;/s,
+    about,
+    /className="about-contribute" id="cv-contribute"[\s\S]*id="cv-contribute-volunteer"[\s\S]*id="cv-contribute-contact"/,
   );
   assert.match(
     styles,
-    /\.about-contribute-anchor\s*\{[^}]*display:\s*block;[^}]*height:\s*0;/s,
+    /\.about-contribute\s*\{[^}]*position:\s*relative;/s,
+  );
+  assert.match(styles, /:root\s*\{[^}]*--site-header-clearance:\s*6rem;/s);
+  assert.match(
+    styles,
+    /\.about-contribute,\s*\.about-contribute-anchor\s*\{[^}]*scroll-margin-top:\s*var\(--site-header-clearance\);/s,
+  );
+  assert.match(
+    styles,
+    /\.about-contribute-anchor\s*\{[^}]*position:\s*absolute;[^}]*top:\s*0;[^}]*left:\s*0;[^}]*width:\s*0;[^}]*height:\s*0;/s,
+  );
+  assert.match(
+    styles,
+    /@media \(max-width:\s*800px\)[\s\S]*:root\s*\{[^}]*--site-header-clearance:\s*8\.25rem;/s,
+  );
+  assert.match(
+    styles,
+    /@media \(max-width:\s*540px\)[\s\S]*:root\s*\{[^}]*--site-header-clearance:\s*14\.5rem;/s,
   );
 });
 
@@ -187,14 +204,37 @@ At the start of the existing `about-contribute` panel in
 In `src/app/globals.css`, add:
 
 ```css
+:root {
+  --site-header-clearance: 6rem;
+}
+
+.about-contribute {
+  position: relative;
+}
+
 .about-contribute,
 .about-contribute-anchor {
-  scroll-margin-top: 6rem;
+  scroll-margin-top: var(--site-header-clearance);
 }
 
 .about-contribute-anchor {
-  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
   height: 0;
+}
+
+@media (max-width: 800px) {
+  :root {
+    --site-header-clearance: 8.25rem;
+  }
+}
+
+@media (max-width: 540px) {
+  :root {
+    --site-header-clearance: 14.5rem;
+  }
 }
 ```
 
@@ -283,7 +323,9 @@ Start the production export locally and verify:
 - “Contact” selects “Something else.”
 - On `/about`, switching among the three footer links updates the selection.
 - Browser back/forward restores the selection matching the active hash.
-- The fixed header does not cover the contribution heading.
+- At 375, 540, 800, and 1280px widths, all three targets share the panel's
+  exact top coordinate and the fixed header does not cover the contribution
+  heading.
 - Manual select changes and form submission remain functional.
 
 - [ ] **Step 8: Commit the focused implementation**

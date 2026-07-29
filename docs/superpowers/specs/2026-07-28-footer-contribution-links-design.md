@@ -33,10 +33,12 @@ with the appropriate “What would you like to share?” selection.
 ## Scrolling and Presentation
 
 - Keep `id="cv-contribute"` on the contribution panel.
-- Add zero-height anchor targets for the volunteer and contact hashes at the
-  top of the same panel.
-- Apply the same scroll margin to all three targets so the fixed site header
-  does not obscure the section.
+- Add zero-size, absolutely positioned anchor targets for the volunteer and
+  contact hashes at the panel's exact top edge.
+- Apply the same responsive `--site-header-clearance` scroll margin to all
+  three targets so the fixed site header does not obscure the section:
+  `6rem` by default, `8.25rem` at 800px and below, and `14.5rem` at 540px and
+  below.
 - Do not change the footer's columns, visual styling, form fields, wording, or
   Google Form submission destination.
 
@@ -56,7 +58,7 @@ with the appropriate “What would you like to share?” selection.
 
 - Add an automated contract test for the three exact footer destinations, the
   three selection outcomes, the controlled select, the hash-change listener,
-  and the shared anchor position.
+  the shared anchor position, and responsive header clearance values.
 - Run the focused test, full test suite, lint, TypeScript, production build,
   and `git diff --check`.
 - In a browser, verify each footer link from a non-About route and verify
