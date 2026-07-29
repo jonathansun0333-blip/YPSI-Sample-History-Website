@@ -4,7 +4,7 @@
 
 **Goal:** Make the shared footer's contribution links navigate to the About-page contribution panel with the intended submission type selected.
 
-**Architecture:** Next.js links encode intent in three bookmarkable hashes. The About page exposes three co-located anchor targets, while the client-side contribution form maps the current hash to controlled select state on initial hydration and every `hashchange`.
+**Architecture:** Base-path-aware native anchors encode intent in three bookmarkable hashes without allowing the Next.js 16 segment cache to compound same-page fragments. The About page exposes three co-located anchor targets, while the client-side contribution form maps the current hash to controlled select state on initial hydration and every `hashchange`.
 
 **Tech Stack:** Next.js 16, React 19, TypeScript, native CSS, Node built-in test runner.
 
@@ -15,7 +15,10 @@
 - “Contact” selects “Something else.”
 - All three destinations scroll to the “Have a story worth keeping?” panel.
 - Keep the footer columns, form fields, wording, and Google Form submission destination unchanged.
-- Preserve GitHub Pages base-path compatibility by using Next.js `Link`.
+- Preserve GitHub Pages base-path compatibility with the existing
+  `withBasePath` helper.
+- Use native anchors for these three targets so same-page hash changes replace
+  the previous fragment.
 - Unknown or missing hashes fall back to “An oral history interview.”
 - Add no dependencies.
 
@@ -32,7 +35,8 @@
 
 **Interfaces:**
 - Consumes: The shared `RootLayout` footer, the `#cv-contribute` panel, and the existing submission-type option values.
-- Produces: `getSubmissionTypeForHash(hash: string): string`, three footer hashes, and three co-located anchor targets.
+- Produces: `getSubmissionTypeForHash(hash: string): string`, three
+  base-path-aware native footer anchors, and three co-located anchor targets.
 - Preserves: Existing form submission behavior, manual select changes, footer layout, and GitHub Pages base-path handling.
 
 - [ ] **Step 1: Write the failing navigation contract**
@@ -57,15 +61,19 @@ test("footer contribution links target the About contribution panel", async () =
 
   assert.match(
     layout,
-    /<Link href="\/about#cv-contribute">Contribute a Story<\/Link>/,
+    /import \{ withBasePath \} from "@\/lib\/asset-path";/,
   );
   assert.match(
     layout,
-    /<Link href="\/about#cv-contribute-volunteer">Volunteer<\/Link>/,
+    /<a href=\{withBasePath\("\/about\/#cv-contribute"\)\}>Contribute a Story<\/a>/,
   );
   assert.match(
     layout,
-    /<Link href="\/about#cv-contribute-contact">Contact<\/Link>/,
+    /<a href=\{withBasePath\("\/about\/#cv-contribute-volunteer"\)\}>Volunteer<\/a>/,
+  );
+  assert.match(
+    layout,
+    /<a href=\{withBasePath\("\/about\/#cv-contribute-contact"\)\}>Contact<\/a>/,
   );
 });
 
@@ -131,14 +139,17 @@ secondary anchors do not exist, and the select is uncontrolled.
 
 - [ ] **Step 3: Implement the three shared footer links**
 
-In `src/app/layout.tsx`, replace the three plain labels with:
+In `src/app/layout.tsx`, import `withBasePath` and replace the three plain
+labels with native anchors:
 
 ```tsx
+import { withBasePath } from "@/lib/asset-path";
+
 <li>
-  <Link href="/about#cv-contribute">Contribute a Story</Link>
+  <a href={withBasePath("/about/#cv-contribute")}>Contribute a Story</a>
 </li>
 <li>
-  <Link href="/about#cv-contribute-volunteer">Volunteer</Link>
+  <a href={withBasePath("/about/#cv-contribute-volunteer")}>Volunteer</a>
 </li>
 ```
 
@@ -146,9 +157,14 @@ and:
 
 ```tsx
 <li>
-  <Link href="/about#cv-contribute-contact">Contact</Link>
+  <a href={withBasePath("/about/#cv-contribute-contact")}>Contact</a>
 </li>
 ```
+
+Native navigation is intentional here. Next.js 16.2.10 can concatenate the
+existing and requested fragments when a prefetched same-route `Link` is clicked;
+the browser's native anchor behavior replaces the fragment and emits the
+`hashchange` event consumed by `ContributeForm`.
 
 - [ ] **Step 4: Add co-located About-page anchors**
 

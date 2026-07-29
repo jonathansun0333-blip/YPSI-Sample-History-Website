@@ -92,6 +92,16 @@ export default function AboutPage() {
 
         {/* Contribute panel */}
         <div className="about-contribute" id="cv-contribute">
+          <span
+            className="about-contribute-anchor"
+            id="cv-contribute-volunteer"
+            aria-hidden="true"
+          />
+          <span
+            className="about-contribute-anchor"
+            id="cv-contribute-contact"
+            aria-hidden="true"
+          />
           <div className="contribute-inner">
             <div className="contribute-copy">
               <h2 className="contribute-h2">

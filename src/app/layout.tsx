@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/site-header";
+import { withBasePath } from "@/lib/asset-path";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -58,8 +59,12 @@ export default function RootLayout({
             <div className="site-panel-col">
               <h4>Get Involved</h4>
               <ul>
-                <li>Contribute a Story</li>
-                <li>Volunteer</li>
+                <li>
+                  <a href={withBasePath("/about/#cv-contribute")}>Contribute a Story</a>
+                </li>
+                <li>
+                  <a href={withBasePath("/about/#cv-contribute-volunteer")}>Volunteer</a>
+                </li>
               </ul>
             </div>
 
@@ -67,7 +72,9 @@ export default function RootLayout({
               <h4>Project</h4>
               <ul>
                 <li><Link href="/about">About</Link></li>
-                <li>Contact</li>
+                <li>
+                  <a href={withBasePath("/about/#cv-contribute-contact")}>Contact</a>
+                </li>
               </ul>
             </div>
           </div>

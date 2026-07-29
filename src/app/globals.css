@@ -1309,6 +1309,16 @@ html.dark .archive-page {
   margin: 3rem 0 5rem;
 }
 
+.about-contribute,
+.about-contribute-anchor {
+  scroll-margin-top: 6rem;
+}
+
+.about-contribute-anchor {
+  display: block;
+  height: 0;
+}
+
 .contribute-inner {
   display: flex;
   flex-wrap: wrap;

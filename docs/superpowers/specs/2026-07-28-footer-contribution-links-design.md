@@ -42,8 +42,12 @@ with the appropriate “What would you like to share?” selection.
 
 ## Platform Constraints
 
-- Use Next.js `Link` so production base-path handling remains compatible with
-  the GitHub Pages static export.
+- Use native anchors with the existing `withBasePath` helper so production
+  base-path handling remains compatible with the GitHub Pages static export.
+- Do not route these three same-page hash changes through Next.js `Link`.
+  Next.js 16.2.10's segment-cache navigation can retain the previous fragment
+  in `route.canonicalUrl` and append the requested fragment, producing an
+  invalid compounded hash after a second footer click.
 - Use URL hashes rather than storage or query parameters so the destinations
   remain bookmarkable and require no server-side or Suspense-dependent state.
 - Add no dependencies.

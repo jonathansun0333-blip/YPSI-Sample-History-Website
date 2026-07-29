@@ -1,6 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+const DEFAULT_SUBMISSION_TYPE = "An oral history interview";
+
+const SUBMISSION_TYPE_BY_HASH: Readonly<Record<string, string>> = {
+  "#cv-contribute-volunteer": "I want to volunteer",
+  "#cv-contribute-contact": "Something else",
+};
+
+export function getSubmissionTypeForHash(hash: string) {
+  return SUBMISSION_TYPE_BY_HASH[hash] ?? DEFAULT_SUBMISSION_TYPE;
+}
 
 const GOOGLE_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLScunIVUmNf42QvpOZsToB8EgtYPHdTKMbDsZwJKJ8bmPbx1Kw/viewform";
@@ -13,6 +24,24 @@ const ENTRY = {
 } as const;
 
 export default function ContributeForm() {
+  const [submissionType, setSubmissionType] = useState(
+    DEFAULT_SUBMISSION_TYPE,
+  );
+
+  useEffect(() => {
+    function syncSubmissionType() {
+      setSubmissionType(getSubmissionTypeForHash(window.location.hash));
+    }
+
+    const frameId = window.requestAnimationFrame(syncSubmissionType);
+    window.addEventListener("hashchange", syncSubmissionType);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("hashchange", syncSubmissionType);
+    };
+  }, []);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -74,7 +103,14 @@ export default function ContributeForm() {
         <label className="form-label" htmlFor="about-type">
           What would you like to share?
         </label>
-        <select id="about-type" name="submissionType" className="form-select" required>
+        <select
+          id="about-type"
+          name="submissionType"
+          className="form-select"
+          value={submissionType}
+          onChange={(event) => setSubmissionType(event.target.value)}
+          required
+        >
           <option value="An oral history interview">An oral history interview</option>
           <option value="Photographs or documents">Photographs or documents</option>
           <option value="A family member's story">A family member&apos;s story</option>
