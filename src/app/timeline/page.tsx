@@ -12,7 +12,7 @@ export default function TimelinePage() {
       <div className="tl-page-inner">
         <div className="tl-eyebrow">
           <span>Interactive Timeline</span>
-          <span>14 events · 250 years</span>
+          <span>15 events · 241 years</span>
         </div>
         <h1 className="tl-h1">
           Cupertino, <span className="tl-h1-accent">year by year</span>.

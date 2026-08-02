@@ -2,156 +2,285 @@
 
 import { useState } from "react";
 
-const EVENTS = [
+type TimelineEvent = {
+  year: number;
+  yearLabel: string;
+  era: string;
+  title: string;
+  description: string;
+  where: string;
+  lookUp: string;
+};
+
+const EVENTS: TimelineEvent[] = [
   {
-    year: "1776",
-    era: "Pre-history",
-    title: "The De Anza expedition arrives",
-    description: "Juan Bautista de Anza's Spanish expedition passed through the valley, mapping land that had been home to the Tamien Ohlone for thousands of years.",
-    where: "The valley, broadly",
-    lookUp: "Anza expedition diaries",
+    year: 1776,
+    yearLabel: "1776",
+    era: "Exploration",
+    title: "De Anza expedition arrives",
+    description:
+      "In 1776, Spanish explorer Juan Bautista de Anza passed through the Cupertino region during an expedition to settle California. A nearby creek was named \"Arroyo San Jose de Cupertino\" after Saint Joseph of Cupertino, which later inspired the city's name.",
+    where: "Cupertino region",
+    lookUp: "De Anza expedition records",
   },
   {
-    year: "1850",
+    year: 1850,
+    yearLabel: "1850",
     era: "Statehood",
     title: "California becomes a state",
-    description: "Statehood ushered in a wave of settlers — many of them French, Italian, and Portuguese — who would establish the orchards that defined the valley for a century.",
-    where: "Santa Clara County",
-    lookUp: "CA State Archives",
+    description:
+      "In 1850, California was established as a state. Following the Gold Rush and new statehood, many immigrants came to the area for its rich and fertile soil, and Cupertino remained a rural farming and ranching community often called the \"West Side.\"",
+    where: "West Side of Santa Clara County",
+    lookUp: "California statehood records",
   },
   {
-    year: "1870s",
-    era: "Naming",
-    title: "A name takes root: Cupertino",
-    description: "A small community of farmers grew around the Stevens Creek crossroads. A French wine-merchant's estate gave the area its eventual name.",
-    where: "Stevens Creek Rd. & Saich Way",
-    lookUp: "Local newspapers",
+    year: 1867,
+    yearLabel: "1867",
+    era: "Education",
+    title: "Cupertino's first school",
+    description:
+      "Cupertino's first school, Lincoln School, opened its earliest school building and provided education to the small community of residents living there at the time.",
+    where: "Lincoln School",
+    lookUp: "Local school district history",
   },
   {
-    year: "1898",
-    era: "Post Office",
+    year: 1870,
+    yearLabel: "1870s",
+    era: "Growth",
+    title: "Cupertino progresses",
+    description:
+      "Many American and European immigrants established family farms, wineries, vineyards, and ranches, taking advantage of the fertile soil. The De Anza Boulevard and Stevens Creek Road intersection also began development and featured early community services.",
+    where: "City crossroads and farm districts",
+    lookUp: "Local agricultural records",
+  },
+  {
+    year: 1898,
+    yearLabel: "1898",
+    era: "Identity",
     title: "Cupertino gets a post office",
-    description: "The 'Cupertino' name was officially recognized when the U.S. Postal Service opened a branch — solidifying the community's identity beyond a railway stop.",
-    where: "Old town center",
+    description:
+      "The name \"Cupertino\" was officially adopted and changed from \"West Side\" when the U.S. Postal Service opened a branch, solidifying the community's identity beyond a railway stop.",
+    where: "Post office branch",
     lookUp: "USPS records",
   },
   {
-    year: "1924",
-    era: "Recreation",
-    title: "Blackberry Farm opens",
-    description: "The Blackberry Farm resort opened along the creek, becoming a beloved summer destination for Bay Area families for the next several decades.",
-    where: "Blackberry Farm Park",
-    lookUp: "Cupertino Historical Society",
+    year: 1917,
+    yearLabel: "1917",
+    era: "Education",
+    title: "Cupertino Union School District is established",
+    description:
+      "Four local schools - San Antonio, Lincoln, Doyle, and Collins - came together to establish the Cupertino Union School District. The district began with four one-room school buildings.",
+    where: "Cupertino Union School District",
+    lookUp: "District foundation records",
   },
   {
-    year: "1939",
-    era: "Agriculture",
+    year: 1924,
+    yearLabel: "1924",
+    era: "Parks",
+    title: "Stevens Creek County Park opens",
+    description:
+      "Stevens Creek County Park officially opened to the public after the acquisition of 400 acres, creating the first park in the Santa Clara County Parklands System.",
+    where: "Stevens Creek County Park",
+    lookUp: "Santa Clara County park records",
+  },
+  {
+    year: 1939,
+    yearLabel: "1939",
+    era: "Agriculture & Industry",
     title: "Peak of the 'Valley of Heart's Delight'",
-    description: "Santa Clara Valley reached its peak as the world's largest fruit-producing region. Cupertino's apricot orchards stretched from the foothills to the rail line.",
-    where: "Across the city",
-    lookUp: "Census of Agriculture",
+    description:
+      "Cupertino reached its peak as part of the world's largest fruit-producing region with orchards of prunes, cherries, peaches, nuts, and other Mediterranean crops. A deep limestone quarry and industrial cement plants also began operation in the west hills.",
+    where: "Citywide and west hills",
+    lookUp: "Agricultural and industrial records",
   },
   {
-    year: "1955",
-    era: "Incorporation",
+    year: 1955,
+    yearLabel: "1955",
+    era: "Cityhood",
     title: "Cupertino is incorporated as a city",
-    description: "On October 10, residents voted to incorporate to fend off annexation by San Jose. The new city of about 2,500 residents covered roughly three square miles.",
+    description:
+      "On October 10, Cupertino officially became Santa Clara County's 13th city with around 2,000 residents and spanning roughly four miles. Local residents pushed for cityhood and won a close vote.",
     where: "Citywide",
-    lookUp: "City of Cupertino archives",
+    lookUp: "City incorporation archives",
   },
   {
-    year: "1962",
+    year: 1967,
+    yearLabel: "1967",
+    era: "Higher Education",
+    title: "De Anza College opens",
+    description:
+      "The 112-acre campus opened on September 11 on the historic Charles Baldwin winery estate. Its contemporary mission style with adobe walls and red tile roofs helped transform Cupertino into a modern suburban community with an educational hub.",
+    where: "De Anza College campus",
+    lookUp: "Foothill-De Anza district records",
+  },
+  {
+    year: 1969,
+    yearLabel: "1969",
     era: "Schools",
     title: "Monta Vista High School opens",
-    description: "Built to serve the families flooding into new tract housing on former orchard land, Monta Vista would become a defining institution of Cupertino life.",
+    description:
+      "Monta Vista High School opened in the fall with only 9th and 10th grade classes to reduce crowding at nearby Homestead High School. It later became one of California's top-ranked high schools.",
     where: "Foothill area",
     lookUp: "FUHSD records",
   },
   {
-    year: "1967",
-    era: "Education",
-    title: "De Anza College opens",
-    description: "The community college opened on the former Beaulieu Vineyard ranch. Its first classes met in temporary buildings amid the old grapevines.",
-    where: "21250 Stevens Creek Blvd.",
-    lookUp: "Foothill-De Anza District",
-  },
-  {
-    year: "1977",
-    era: "Industry",
+    year: 1977,
+    yearLabel: "1977",
+    era: "Technology",
     title: "Apple Computer moves to Cupertino",
-    description: "The young company moved its headquarters into a small office at 20863 Stevens Creek Boulevard, marking the city's transition from orchards to chip fabs.",
-    where: "Stevens Creek Blvd.",
+    description:
+      "The young company, Apple, moved its headquarters into a small office at 20863 Stevens Creek Boulevard, marking Cupertino's transition from orchards to technology and innovation.",
+    where: "20863 Stevens Creek Boulevard",
     lookUp: "Apple corporate history",
   },
   {
-    year: "1986",
-    era: "Heritage",
-    title: "Cupertino Historical Society founded",
-    description: "A group of longtime residents established the historical society to preserve the photographs, documents, and oral histories of the rapidly changing city.",
-    where: "Quinlan Community Center",
-    lookUp: "CHS records",
-  },
-  {
-    year: "1993",
-    era: "Architecture",
-    title: "Apple's Infinite Loop campus opens",
-    description: "Built on land that had grown apricots a generation earlier, the campus became the most recognized address in the city for the next two decades.",
+    year: 1993,
+    yearLabel: "1993",
+    era: "Technology",
+    title: "Apple Infinite Loop campus opens",
+    description:
+      "Apple moved to the Infinite Loop campus as its previous offices had become too scattered and small. Built on land that had grown apricots a generation earlier, it became Cupertino's most recognized address for the next two decades.",
     where: "Infinite Loop",
     lookUp: "Apple corporate history",
   },
   {
-    year: "2017",
-    era: "Architecture",
+    year: 2004,
+    yearLabel: "2004",
+    era: "Community",
+    title: "Current Cupertino Library opens",
+    description:
+      "The current 54,000-square-foot library at 10800 Torre Avenue opened in October. It serves as an educational and social center for the Cupertino community.",
+    where: "10800 Torre Avenue",
+    lookUp: "Santa Clara County Library records",
+  },
+  {
+    year: 2017,
+    yearLabel: "2017",
+    era: "Technology",
     title: "Apple Park opens",
-    description: "The ring-shaped \"spaceship\" campus opened on land that had been orchard within living memory. It would house tens of thousands of employees.",
+    description:
+      "Apple employees began moving into a massive 175-acre circular \"spaceship\" campus that became Apple's main campus for headquarters logistics and day-to-day operations.",
     where: "Apple Park Way",
     lookUp: "Apple corporate history",
   },
-  {
-    year: "2026",
-    era: "Today",
-    title: "The archive continues",
-    description: "Cupertino Voices launches as an open public archive of the community's history, gathering interviews, photographs, and documents from generations of residents.",
-    where: "Online",
-    lookUp: "This site",
-  },
 ];
+
+const MIN_YEAR = EVENTS[0]?.year ?? 0;
+const MAX_YEAR = EVENTS[EVENTS.length - 1]?.year ?? MIN_YEAR;
+const YEAR_SPAN = Math.max(1, MAX_YEAR - MIN_YEAR);
+const YEAR_MARKERS = [MIN_YEAR, 1850, 1900, 1950, 2000, MAX_YEAR].filter(
+  (year, markerIndex, markerYears) =>
+    year >= MIN_YEAR &&
+    year <= MAX_YEAR &&
+    markerYears.indexOf(year) === markerIndex,
+);
+
+const YEAR_SIZER = EVENTS.reduce(
+  (widestLabel, currentEvent) =>
+    currentEvent.yearLabel.length > widestLabel.length
+      ? currentEvent.yearLabel
+      : widestLabel,
+  EVENTS[0]?.yearLabel ?? "",
+);
+
+function yearToProgress(year: number) {
+  return ((year - MIN_YEAR) / YEAR_SPAN) * 100;
+}
+
+function findNearestEventIndex(year: number) {
+  return EVENTS.reduce((nearestIndex, currentEvent, currentIndex) => {
+    const nearestDistance = Math.abs(EVENTS[nearestIndex].year - year);
+    const currentDistance = Math.abs(currentEvent.year - year);
+    return currentDistance < nearestDistance ? currentIndex : nearestIndex;
+  }, 0);
+}
 
 export default function TimelineExplorer() {
   const [index, setIndex] = useState(0);
-  const event = EVENTS[index];
-  const progress = (index / (EVENTS.length - 1)) * 100;
+  const event = EVENTS[index] ?? EVENTS[0];
+  const progress = yearToProgress(event.year);
+
+  const handleScrubChange = (selectedYear: number) => {
+    setIndex(findNearestEventIndex(selectedYear));
+  };
 
   return (
     <div className="tl-explorer">
       {/* Scrubber row */}
       <div className="tl-scrub-row">
         <div className="tl-year-big" aria-hidden="true">
-          <span className="tl-year-sizer">1870s</span>
-          <span className="tl-year-vis">{event.year}</span>
+          <span className="tl-year-sizer">{YEAR_SIZER}</span>
+          <span className="tl-year-vis">{event.yearLabel}</span>
         </div>
         <div className="tl-scrub-track">
           <div className="tl-line-row">
             <div className="tl-track-line">
               <div className="tl-track-fill" style={{ width: `${progress}%` }} />
+              {EVENTS.map((timelineEvent, eventIndex) => (
+                <span
+                  key={`${timelineEvent.yearLabel}-${timelineEvent.title}`}
+                  className={`tl-track-notch${eventIndex === index ? " is-active" : ""}`}
+                  style={{ left: `${yearToProgress(timelineEvent.year)}%` }}
+                  aria-hidden="true"
+                />
+              ))}
             </div>
             <input
               type="range"
               className="tl-scrub"
-              min={0}
-              max={EVENTS.length - 1}
-              value={index}
-              onChange={(e) => setIndex(Number(e.target.value))}
+              min={MIN_YEAR}
+              max={MAX_YEAR}
+              step={1}
+              value={event.year}
+              onChange={(e) => handleScrubChange(Number(e.target.value))}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setIndex((currentIndex) =>
+                    Math.min(EVENTS.length - 1, currentIndex + 1),
+                  );
+                }
+
+                if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setIndex((currentIndex) => Math.max(0, currentIndex - 1));
+                }
+
+                if (e.key === "Home") {
+                  e.preventDefault();
+                  setIndex(0);
+                }
+
+                if (e.key === "End") {
+                  e.preventDefault();
+                  setIndex(EVENTS.length - 1);
+                }
+              }}
               aria-label="Select a timeline event"
             />
           </div>
           <div className="tl-year-labels">
-            <span>1776</span>
-            <span>1850</span>
-            <span>1900</span>
-            <span>1950</span>
-            <span>2000</span>
-            <span>2026</span>
+            {YEAR_MARKERS.map((yearMarker, markerIndex) => {
+              const isFirst = markerIndex === 0;
+              const isLast = markerIndex === YEAR_MARKERS.length - 1;
+              const transform = isFirst
+                ? "translateX(0)"
+                : isLast
+                  ? "translateX(-100%)"
+                  : "translateX(-50%)";
+
+              return (
+                <span
+                  key={yearMarker}
+                  style={{
+                    left: `${yearToProgress(yearMarker)}%`,
+                    transform,
+                  }}
+                >
+                  {yearMarker}
+                </span>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -159,7 +288,7 @@ export default function TimelineExplorer() {
       {/* Event card */}
       <div className="tl-card" aria-live="polite">
         <div className="tl-card-left">
-          <div className="tl-card-year">{event.year}</div>
+          <div className="tl-card-year">{event.yearLabel}</div>
           <div className="tl-card-era">{event.era}</div>
         </div>
         <div className="tl-card-mid">

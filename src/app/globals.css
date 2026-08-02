@@ -2326,13 +2326,15 @@ html.dark .archive-page {
 
 .tl-line-row {
   position: relative;
-  height: 2px;
+  height: 18px;
 }
 
 .tl-track-line {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
   height: 2px;
   background: var(--line);
-  position: relative;
 }
 
 .tl-track-fill {
@@ -2342,6 +2344,23 @@ html.dark .archive-page {
   height: 100%;
   background: var(--ink);
   transition: width 0.1s linear;
+}
+
+.tl-track-notch {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  background: color-mix(in srgb, var(--ink) 42%, var(--line));
+  opacity: 0.75;
+  transition: height 0.1s linear, opacity 0.1s linear;
+}
+
+.tl-track-notch.is-active {
+  height: 16px;
+  background: var(--ink);
+  opacity: 1;
 }
 
 .tl-scrub {
@@ -2377,7 +2396,6 @@ html.dark .archive-page {
   background: var(--surface);
   border: 2px solid var(--ink);
   cursor: pointer;
-  border: none;
 }
 
 .tl-scrub:hover::-webkit-slider-thumb {
@@ -2389,14 +2407,20 @@ html.dark .archive-page {
 }
 
 .tl-year-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.8rem;
+  position: relative;
+  height: 1rem;
+  margin-top: 0.9rem;
   font-family: 'Archivo', sans-serif;
   font-size: 0.66rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   color: var(--ink-mute);
+}
+
+.tl-year-labels span {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
 }
 
 /* Event card */
