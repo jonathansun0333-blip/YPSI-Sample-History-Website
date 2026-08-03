@@ -9,7 +9,7 @@ interface Location {
   lat: number;
   lng: number;
   popupDesc: string;
-  baSceneIndex?: number;
+  baSceneId?: string;
 }
 
 // Cupertino city boundary coordinates (lat, lng) extracted from official boundary data
@@ -18,12 +18,12 @@ const CUPERTINO_BOUNDARY: [number, number][] = [
 ];
 
 const LOCATIONS: Location[] = [
-  { id: 1, name: "Stevens Creek & De Anza", years: "1955 — 2026", lat: 37.3249, lng: -122.036, popupDesc: "The city's main crossroads — once orchard country, now its commercial heart.", baSceneIndex: 0 },
-  { id: 2, name: "Blackberry Farm", years: "1924 — Present", lat: 37.3222, lng: -122.0542, popupDesc: "A beloved resort and park along Stevens Creek since 1924.", baSceneIndex: 1 },
-  { id: 3, name: "De Anza College", years: "1967 — Present", lat: 37.3196, lng: -122.0353, popupDesc: "Opened in 1967 on the grounds of the old Beaulieu estate." },
-  { id: 4, name: "Monta Vista High School", years: "1962 — Present", lat: 37.3101, lng: -122.0652, popupDesc: "One of the oldest and most storied schools in the city." },
-  { id: 5, name: "Original Crossroads", years: "1880s — Now", lat: 37.322, lng: -122.0421, popupDesc: "The historic heart of the Cupertino settlement.", baSceneIndex: 2 },
-  { id: 6, name: "McClellan Ranch Preserve", years: "1850s — Present", lat: 37.3035, lng: -122.0527, popupDesc: "A working ranch turned nature preserve in the city's south." },
+  { id: 1, name: "Stevens Creek & De Anza", years: "1948 — 2026", lat: 37.3249, lng: -122.036, popupDesc: "The city's main crossroads — once orchard country, now its commercial heart.", baSceneId: "stevens-creek-de-anza-1948" },
+  { id: 2, name: "Blackberry Farm", years: "1924 — Present", lat: 37.3222, lng: -122.0542, popupDesc: "A beloved resort and park along Stevens Creek since 1924.", baSceneId: "blackberry-farm-1970" },
+  { id: 3, name: "De Anza College", years: "1967 — Present", lat: 37.3196, lng: -122.0353, popupDesc: "Opened in 1967 on the grounds of the old Beaulieu estate.", baSceneId: "de-anza-college-1967" },
+  { id: 4, name: "Monta Vista High School", years: "1962 — Present", lat: 37.3101, lng: -122.0652, popupDesc: "One of the oldest and most storied schools in the city.", baSceneId: "monta-vista-1960s" },
+  { id: 5, name: "Original Crossroads", years: "1880s — Now", lat: 37.322, lng: -122.0421, popupDesc: "The historic heart of the Cupertino settlement.", baSceneId: "de-anza-original-crossroads-1880s" },
+  { id: 6, name: "McClellan Ranch Preserve", years: "1850s — Present", lat: 37.3035, lng: -122.0527, popupDesc: "A working ranch turned nature preserve in the city's south.", baSceneId: "mcclellan-ranch-historic" },
 ];
 
 // Dark/light tile URL templates
@@ -91,8 +91,8 @@ export default function MapClient() {
       // Markers
       for (const loc of LOCATIONS) {
         const icon = L.divIcon({ className: "cv-pin", iconSize: [14, 14], iconAnchor: [7, 7], popupAnchor: [0, -12] });
-        const baLink = loc.baSceneIndex !== undefined
-          ? `<span class="cv-popup-link" data-idx="${loc.baSceneIndex}">View before &amp; after →</span>`
+        const baLink = loc.baSceneId
+          ? `<button type="button" class="cv-popup-link" data-scene-id="${loc.baSceneId}">View before &amp; after →</button>`
           : "";
         const popup = L.popup({ className: "cv-popup" }).setContent(`
           <div class="cv-pop-title">${loc.name}</div>
@@ -106,8 +106,9 @@ export default function MapClient() {
           const link = popup.getElement()?.querySelector<HTMLElement>(".cv-popup-link");
           if (link) {
             link.addEventListener("click", () => {
-              const idx = Number(link.dataset.idx ?? 0);
-              window.dispatchEvent(new CustomEvent("cv:select-ba-scene", { detail: idx }));
+              const sceneId = link.dataset.sceneId;
+              if (!sceneId) return;
+              window.dispatchEvent(new CustomEvent("cv:select-ba-scene", { detail: sceneId }));
               document.getElementById("cv-ba")?.scrollIntoView({ behavior: "smooth" });
             });
           }

@@ -2013,6 +2013,10 @@ html.dark .archive-page {
 .cv-popup-link {
   display: inline-block;
   margin-top: 0.6rem;
+  padding: 0 0 1px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rust);
   font-family: 'Archivo', sans-serif;
   font-size: 0.62rem;
   font-weight: 600;
@@ -2020,8 +2024,11 @@ html.dark .archive-page {
   text-transform: uppercase;
   color: var(--rust);
   cursor: pointer;
-  border-bottom: 1px solid var(--rust);
-  padding-bottom: 1px;
+}
+
+.cv-popup-link:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 3px;
 }
 
 /* ── Before & After section ── */
@@ -2070,6 +2077,8 @@ html.dark .archive-page {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .ba-btn {
@@ -2083,6 +2092,7 @@ html.dark .archive-page {
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
+  min-height: 44px;
 }
 
 .ba-btn:hover {
@@ -2096,6 +2106,12 @@ html.dark .archive-page {
   border-color: var(--ink);
 }
 
+.ba-btn:focus-visible,
+.ba-widget:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 3px;
+}
+
 .ba-widget {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -2104,47 +2120,24 @@ html.dark .archive-page {
   border: 1px solid var(--ink);
   user-select: none;
   cursor: ew-resize;
+  touch-action: none;
+  background: var(--surface-deep);
 }
 
 .ba-before,
 .ba-after {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  overflow: hidden;
+  background: var(--surface-deep);
 }
 
-.ba-before {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(33, 28, 21, 0.05) 0px,
-    rgba(33, 28, 21, 0.05) 1px,
-    transparent 1px,
-    transparent 11px
-  ), rgb(207, 193, 166);
-}
-
-.ba-after {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(33, 28, 21, 0.05) 0px,
-    rgba(33, 28, 21, 0.05) 1px,
-    transparent 1px,
-    transparent 11px
-  ), rgb(196, 204, 202);
-}
-
-.ba-placeholder-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  color: rgba(33, 28, 21, 0.45);
-  font-family: 'Archivo', sans-serif;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+.ba-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
 }
 
 .ba-label {
@@ -2194,12 +2187,43 @@ html.dark .archive-page {
   color: var(--ink);
 }
 
+.ba-descriptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 3rem;
+  margin-top: 1.5rem;
+}
+
+.ba-description {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.ba-description h3 {
+  margin: 0 0 0.55rem;
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rust);
+}
+
+.ba-description p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
 .ba-caption {
   font-size: 0.92rem;
   color: var(--ink-soft);
   line-height: 1.6;
-  margin: 1.2rem 0 0;
+  margin: 1.5rem 0 0;
   max-width: 680px;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
 }
 
 @media (max-width: 700px) {
@@ -2228,6 +2252,34 @@ html.dark .archive-page {
 
   .map-sidebar {
     max-width: 100%;
+  }
+
+  .map-ba-section {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ba-selector {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    padding-bottom: 0.35rem;
+    scrollbar-width: thin;
+  }
+
+  .ba-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .ba-widget {
+    aspect-ratio: 4 / 3;
+  }
+
+  .ba-descriptions {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 }
 
