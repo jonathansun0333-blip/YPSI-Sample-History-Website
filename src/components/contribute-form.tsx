@@ -65,7 +65,7 @@ export default function ContributeForm() {
     destination.searchParams.set(ENTRY.submissionType, submissionType);
     destination.searchParams.set(ENTRY.message,        message);
 
-    window.location.assign(destination.toString());
+    window.open(destination.toString(), "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -112,8 +112,8 @@ export default function ContributeForm() {
           required
         >
           <option value="An oral history interview">An oral history interview</option>
-          <option value="Photographs or documents">Photographs or documents</option>
-          <option value="A family member's story">A family member&apos;s story</option>
+          <option value="Photographs or Documents">Photographs or Documents</option>
+          <option value="A story">A story</option>
           <option value="I want to volunteer">I want to volunteer</option>
           <option value="Something else">Something else</option>
         </select>

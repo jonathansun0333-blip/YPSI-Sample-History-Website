@@ -97,3 +97,33 @@ test("submission type follows the current contribution hash", async () => {
     /<select[\s\S]*value=\{submissionType\}[\s\S]*onChange=\{\(event\) => setSubmissionType\(event\.target\.value\)\}/,
   );
 });
+
+test("submission type options exactly match the Google Form choices", async () => {
+  const form = await readFile(formUrl, "utf8");
+  const options = [...form.matchAll(/<option value="([^"]+)">([^<]+)<\/option>/g)]
+    .map(([, value, label]) => ({ value, label }));
+
+  assert.deepEqual(options, [
+    {
+      value: "An oral history interview",
+      label: "An oral history interview",
+    },
+    {
+      value: "Photographs or Documents",
+      label: "Photographs or Documents",
+    },
+    { value: "A story", label: "A story" },
+    { value: "I want to volunteer", label: "I want to volunteer" },
+    { value: "Something else", label: "Something else" },
+  ]);
+});
+
+test("submission opens the prefilled Google Form in a new tab", async () => {
+  const form = await readFile(formUrl, "utf8");
+
+  assert.match(
+    form,
+    /window\.open\(destination\.toString\(\), "_blank", "noopener,noreferrer"\)/,
+  );
+  assert.doesNotMatch(form, /window\.location\.assign/);
+});
