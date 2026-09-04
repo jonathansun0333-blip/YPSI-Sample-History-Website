@@ -21,7 +21,10 @@ them, so this setup can wait and nothing looks broken in the meantime.
 
 ## 2. Create the tables
 
-Open **SQL Editor** in the Supabase dashboard and run this once:
+Open **SQL Editor** in the Supabase dashboard and run
+[`docs/supabase-schema.sql`](supabase-schema.sql) — it contains everything in
+this section and the next, is safe to re-run, and is the fastest path. The
+statements are reproduced below for reference:
 
 ```sql
 -- Visitor comments. Nothing is public until a moderator approves it.
