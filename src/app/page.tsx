@@ -3,6 +3,7 @@ import OTDSection from "../components/otd-section";
 import FeaturedStories from "../components/featured-stories";
 import { getFeaturedStories } from "@/lib/featured-stories";
 import { ARCHIVE_ENTRIES } from "@/data/archive-entries";
+import { TIMELINE_START_YEAR } from "@/data/timeline-events";
 
 function ArrowRight() {
   return (
@@ -53,7 +54,7 @@ export default function HomePage() {
           <aside className="hero-summary">
             <div>
               <span className="hero-summary-label">Span</span>
-              <span className="hero-summary-value">1850 — Present</span>
+              <span className="hero-summary-value">{TIMELINE_START_YEAR} — Present</span>
             </div>
             <div>
               <span className="hero-summary-label">Format</span>
@@ -99,7 +100,7 @@ export default function HomePage() {
             <span className="ways-action">Read <ArrowRight /></span>
           </Link>
           <Link href="/timeline" className="ways-row">
-            <span className="ways-tag">1776 — Now</span>
+            <span className="ways-tag">{TIMELINE_START_YEAR} — Now</span>
             <span className="ways-title">An interactive <em>timeline</em> of major events</span>
             <span className="ways-desc">Scroll the years</span>
             <span className="ways-action">Explore <ArrowRight /></span>

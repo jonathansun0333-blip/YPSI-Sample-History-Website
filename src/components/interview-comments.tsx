@@ -50,7 +50,9 @@ function formatDate(iso: string) {
 
 export default function InterviewComments({ slug }: InterviewCommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Seeded from config rather than always-true, so the disabled case needs no
+  // state update at all and the effect below stays free of a sync setState.
+  const [isLoading, setIsLoading] = useState(isEngagementEnabled);
   const [name, setName] = useState("");
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -58,13 +60,16 @@ export default function InterviewComments({ slug }: InterviewCommentsProps) {
 
   /** Honeypot: hidden from people, irresistible to naive bots. */
   const [website, setWebsite] = useState("");
-  const mountedAt = useRef(Date.now());
+  // Set in an effect, not during render: Date.now() is impure, and reading it
+  // while rendering is exactly what React's purity rule forbids.
+  const mountedAt = useRef(0);
 
   useEffect(() => {
-    if (!supabase) {
-      setIsLoading(false);
-      return;
-    }
+    mountedAt.current = Date.now();
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
 
     let cancelled = false;
 

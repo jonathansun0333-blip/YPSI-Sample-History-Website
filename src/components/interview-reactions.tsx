@@ -35,16 +35,6 @@ export default function InterviewReactions({ slug }: InterviewReactionsProps) {
   const [counts, setCounts] = useState<Counts>({});
   const [myReaction, setMyReaction] = useState<ReactionKey | null>(null);
 
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(storageKey(slug));
-      if (stored) setMyReaction(stored as ReactionKey);
-    } catch {
-      // Private browsing or blocked storage: fall through, the visitor simply
-      // is not remembered between visits.
-    }
-  }, [slug]);
-
   const loadCounts = useCallback(async () => {
     if (!supabase) return;
 
@@ -66,8 +56,24 @@ export default function InterviewReactions({ slug }: InterviewReactionsProps) {
   }, [slug]);
 
   useEffect(() => {
-    loadCounts();
-  }, [loadCounts]);
+    // Restoring the visitor's previous reaction happens here rather than in its
+    // own effect so the update lands after an await. Reading localStorage during
+    // render would also risk a hydration mismatch: the static HTML is built
+    // without any visitor's storage.
+    async function restoreAndLoad() {
+      await loadCounts();
+
+      try {
+        const stored = window.localStorage.getItem(storageKey(slug));
+        if (stored) setMyReaction(stored as ReactionKey);
+      } catch {
+        // Private browsing or blocked storage: the visitor simply is not
+        // remembered between visits.
+      }
+    }
+
+    restoreAndLoad();
+  }, [loadCounts, slug]);
 
   if (!isEngagementEnabled) return null;
 
