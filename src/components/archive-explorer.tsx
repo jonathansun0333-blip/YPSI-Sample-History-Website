@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArchiveAudioPlayer } from "@/components/archive-audio-player";
 import {
@@ -255,6 +256,14 @@ export default function ArchiveExplorer() {
                 <h3>Full story</h3>
                 <p>{openItem.story}</p>
               </div>
+              {/* The modal is for quick browsing; this is the shareable,
+                  linkable address for the interview. */}
+              <Link
+                href={`/archive/${openItem.slug}`}
+                className="button button-secondary"
+              >
+                Open this interview on its own page
+              </Link>
             </div>
           </div>
         </div>

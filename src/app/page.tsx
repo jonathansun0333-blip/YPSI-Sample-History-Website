@@ -1,6 +1,9 @@
 ﻿import Link from "next/link";
 import OTDSection from "../components/otd-section";
 import FeaturedStories from "../components/featured-stories";
+import { getFeaturedStories } from "@/lib/featured-stories";
+import { ARCHIVE_ENTRIES } from "@/data/archive-entries";
+import { TIMELINE_START_YEAR } from "@/data/timeline-events";
 
 function ArrowRight() {
   return (
@@ -22,6 +25,10 @@ function ArrowRight() {
 }
 
 export default function HomePage() {
+  const featuredStories = getFeaturedStories();
+  // Derived so the home page cannot drift from the archive as interviews land.
+  const interviewCount = ARCHIVE_ENTRIES.length;
+
   return (
     <main className="home-page">
 
@@ -47,11 +54,11 @@ export default function HomePage() {
           <aside className="hero-summary">
             <div>
               <span className="hero-summary-label">Span</span>
-              <span className="hero-summary-value">1850 — Present</span>
+              <span className="hero-summary-value">{TIMELINE_START_YEAR} — Present</span>
             </div>
             <div>
               <span className="hero-summary-label">Format</span>
-              <span className="hero-summary-value">Video, audio, photo, document</span>
+              <span className="hero-summary-value">Audio oral histories, photographs, documents</span>
             </div>
             <div>
               <span className="hero-summary-label">Status</span>
@@ -93,7 +100,7 @@ export default function HomePage() {
             <span className="ways-action">Read <ArrowRight /></span>
           </Link>
           <Link href="/timeline" className="ways-row">
-            <span className="ways-tag">1776 — Now</span>
+            <span className="ways-tag">{TIMELINE_START_YEAR} — Now</span>
             <span className="ways-title">An interactive <em>timeline</em> of major events</span>
             <span className="ways-desc">Scroll the years</span>
             <span className="ways-action">Explore <ArrowRight /></span>
@@ -105,7 +112,7 @@ export default function HomePage() {
             <span className="ways-action">View <ArrowRight /></span>
           </Link>
           <Link href="/archive" className="ways-row">
-            <span className="ways-tag">Growing</span>
+            <span className="ways-tag">{interviewCount} interviews</span>
             <span className="ways-title">The full <em>archive</em> of oral histories &amp; photographs</span>
             <span className="ways-desc">Searchable, filterable</span>
             <span className="ways-action">Browse <ArrowRight /></span>
@@ -119,7 +126,7 @@ export default function HomePage() {
           <span className="section-label">Featured Stories</span>
           <h2>From the <em>collection</em>.</h2>
         </div>
-        <FeaturedStories />
+        <FeaturedStories stories={featuredStories} />
         <div className="stories-cta">
           <Link href="/archive" className="button button-secondary">
             View all stories <ArrowRight />
