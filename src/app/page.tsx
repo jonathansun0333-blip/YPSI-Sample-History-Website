@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import OTDSection from "../components/otd-section";
 import FeaturedStories from "../components/featured-stories";
+import { getFeaturedStories } from "@/lib/featured-stories";
 
 function ArrowRight() {
   return (
@@ -22,6 +23,8 @@ function ArrowRight() {
 }
 
 export default function HomePage() {
+  const featuredStories = getFeaturedStories();
+
   return (
     <main className="home-page">
 
@@ -119,7 +122,7 @@ export default function HomePage() {
           <span className="section-label">Featured Stories</span>
           <h2>From the <em>collection</em>.</h2>
         </div>
-        <FeaturedStories />
+        <FeaturedStories stories={featuredStories} />
         <div className="stories-cta">
           <Link href="/archive" className="button button-secondary">
             View all stories <ArrowRight />
