@@ -2,6 +2,7 @@
 import OTDSection from "../components/otd-section";
 import FeaturedStories from "../components/featured-stories";
 import { getFeaturedStories } from "@/lib/featured-stories";
+import { ARCHIVE_ENTRIES } from "@/data/archive-entries";
 
 function ArrowRight() {
   return (
@@ -24,6 +25,8 @@ function ArrowRight() {
 
 export default function HomePage() {
   const featuredStories = getFeaturedStories();
+  // Derived so the home page cannot drift from the archive as interviews land.
+  const interviewCount = ARCHIVE_ENTRIES.length;
 
   return (
     <main className="home-page">
@@ -54,7 +57,7 @@ export default function HomePage() {
             </div>
             <div>
               <span className="hero-summary-label">Format</span>
-              <span className="hero-summary-value">Video, audio, photo, document</span>
+              <span className="hero-summary-value">Audio oral histories, photographs, documents</span>
             </div>
             <div>
               <span className="hero-summary-label">Status</span>
@@ -108,7 +111,7 @@ export default function HomePage() {
             <span className="ways-action">View <ArrowRight /></span>
           </Link>
           <Link href="/archive" className="ways-row">
-            <span className="ways-tag">Growing</span>
+            <span className="ways-tag">{interviewCount} interviews</span>
             <span className="ways-title">The full <em>archive</em> of oral histories &amp; photographs</span>
             <span className="ways-desc">Searchable, filterable</span>
             <span className="ways-action">Browse <ArrowRight /></span>
