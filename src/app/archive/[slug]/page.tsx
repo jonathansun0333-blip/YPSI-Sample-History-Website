@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArchiveAudioPlayer } from "@/components/archive-audio-player";
+import InterviewComments from "@/components/interview-comments";
+import InterviewReactions from "@/components/interview-reactions";
 import { ARCHIVE_ENTRIES } from "@/data/archive-entries";
 
 /**
@@ -105,6 +107,9 @@ export default async function InterviewPage({ params }: InterviewPageProps) {
             <p>{entry.story}</p>
           </div>
         </div>
+
+        <InterviewReactions slug={entry.slug} />
+        <InterviewComments slug={entry.slug} />
       </div>
     </main>
   );

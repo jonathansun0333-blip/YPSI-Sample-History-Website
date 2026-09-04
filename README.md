@@ -94,6 +94,17 @@ Featured stories are *derived* from the archive on purpose. They used to be a
 separate hand-written list, which drifted out of sync and ended up showing
 invented placeholder names to real visitors.
 
+### Comments and reactions
+
+Interview pages carry visitor reactions and a moderated comment thread, backed
+by Supabase because a static export has nowhere of its own to store them.
+
+**These sections render nothing until `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` are set**, so the site builds and looks
+finished on a fresh clone with no credentials. See
+[`docs/supabase-setup.md`](docs/supabase-setup.md) for the schema, the Row
+Level Security policies that make the public API key safe, and how to moderate.
+
 ## Deploying
 
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds and

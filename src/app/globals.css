@@ -2670,3 +2670,177 @@ html.dark .archive-page {
     --site-header-clearance: 14.5rem;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Interview engagement: reactions and comments
+   Used by src/components/interview-reactions.tsx and interview-comments.tsx
+   on /archive/<slug>. Both render nothing until Supabase is configured, so
+   these rules are inert on a fresh clone.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.interview-reactions,
+.interview-comments {
+  margin-top: 3.5rem;
+  padding-top: 2.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.reactions-heading,
+.interview-comments h2 {
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 1.1rem;
+}
+
+.reactions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.reaction-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.reaction-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.reaction-button:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.reaction-button-active {
+  border-color: var(--accent);
+  background: var(--surface-deep);
+  color: var(--ink);
+  opacity: 1;
+}
+
+.reaction-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.reactions-thanks,
+.comment-note,
+.comments-empty {
+  margin-top: 0.85rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+  display: grid;
+  gap: 1.4rem;
+}
+
+.comment {
+  padding: 1.1rem 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.comment-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.comment-meta strong {
+  color: var(--ink);
+}
+
+.comment-body {
+  color: var(--ink-soft);
+  line-height: 1.65;
+  /* Visitor text: keep long unbroken strings from widening the layout. */
+  overflow-wrap: anywhere;
+}
+
+.comment-form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 42rem;
+}
+
+.comment-form label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.comment-form input[type="text"],
+.comment-form textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.comment-form input[type="text"]:focus,
+.comment-form textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.comment-form textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.comment-form .button {
+  justify-self: start;
+  margin-top: 0.4rem;
+}
+
+/* Honeypot. Off-screen rather than display:none — some bots skip hidden
+   fields, but a positioned field still looks fillable to them. */
+.comment-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.comment-error {
+  color: var(--accent);
+  font-size: 0.88rem;
+}
+
+.comment-success {
+  padding: 1rem 1.15rem;
+  background: var(--surface-deep);
+  border-left: 3px solid var(--accent);
+  color: var(--ink-soft);
+  font-size: 0.93rem;
+}
+
+@media (max-width: 640px) {
+  .reaction-button {
+    flex: 1 1 calc(50% - 0.6rem);
+    justify-content: center;
+  }
+}
